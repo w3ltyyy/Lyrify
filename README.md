@@ -41,7 +41,7 @@
    *По умолчанию API доступно на `http://localhost:8080`.*
 
 #### 2. Установка расширения Lyrify
-1. Убедитесь, что у вас установлен [Spicetify-cli](https://spicetify.app/).
+1. Убедитесь, что у вас установлен [Spicetify-cli](https://github.com/spicetify/cli).
 2. Перейдите в папку расширения: `cd spicetify-lyrics-sync`.
 3. Запустите скрипт сборки:
    ```bash
@@ -111,7 +111,7 @@ The central hub for data storage and moderation.
    *The API runs on port `8080` by default.*
 
 #### 2. Extension Deployment
-1. Ensure [Spicetify-cli](https://spicetify.app/) is configured.
+1. Ensure [Spicetify-cli](https://github.com/spicetify/cli) is configured.
 2. Navigate to the extension folder: `cd spicetify-lyrics-sync`.
 3. Run the automated deployment script:
    ```bash
