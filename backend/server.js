@@ -202,7 +202,7 @@ const server = http.createServer(async (req, res) => {
         try {
             return { ...r, lines: JSON.parse(r.lines || "[]") };
         } catch (e) {
-            console.error(`[spotytext] Failed to parse lines for submission ${r.id}:`, e);
+            console.error(`[lyrify] Failed to parse lines for submission ${r.id}:`, e);
             return { ...r, lines: [] };
         }
       });
@@ -412,5 +412,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`[spotytext] SQLite backend listening on http://localhost:${PORT}`);
+  console.log(`[lyrify] SQLite backend listening on http://localhost:${PORT}`);
 });

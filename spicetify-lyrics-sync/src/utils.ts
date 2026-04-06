@@ -90,7 +90,7 @@ export function formatMs(ms: number) {
   return `${m}:${String(ss).padStart(2, "0")}`;
 }
 
-const AUTHOR_ID_KEY = "spotytext_author_id";
+const AUTHOR_ID_KEY = "lyrify_author_id";
 export function getOrCreateAuthorId(): string {
     let id = localStorage.getItem(AUTHOR_ID_KEY);
     if (!id) {

@@ -3,10 +3,10 @@ import { SPOTIFY_SELECTORS } from "../selectors";
 
 export function createInlineTrigger(onToggle: () => void) {
   const btn = h("button", {
-    id: "spotytext-inline-trigger",
+    id: "lyrify-inline-trigger",
     type: "button",
-    title: "Spotytext lyrics",
-    className: "spotytext-btn",
+    title: "Lyrify lyrics",
+    className: "lyrify-btn",
     onclick: (e: MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
@@ -43,7 +43,7 @@ export function mountInlineTrigger(onToggle: () => void) {
 
   if (!nativeBtn) return;
 
-  let trigger = document.getElementById("spotytext-inline-trigger");
+  let trigger = document.getElementById("lyrify-inline-trigger");
   if (!trigger) {
     trigger = createInlineTrigger(onToggle);
   }

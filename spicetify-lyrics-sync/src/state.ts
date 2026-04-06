@@ -15,22 +15,22 @@ export type Settings = {
 };
 
 export const LS_KEYS = {
-  FONT: "spotytext_ui_font_px",
-  BLUR: "spotytext_ui_blur_px",
-  BRIGHT: "spotytext_ui_brightness",
-  AUTO: "spotytext_ui_auto_scroll",
-  DEBUG: "spotytext_ui_show_debug",
-  FULLSCREEN: "spotytext_ui_fullscreen",
-  AUTOGEN: "spotytext_ui_autogen_sync",
-  LINE_GAP: "spotytext_ui_line_gap",
-  MAX_W: "spotytext_ui_max_width",
-  INACTIVE_OP: "spotytext_ui_inactive_op_pct",
-  EDGE_FADE: "spotytext_ui_edge_fade",
-  MINI_X: "spotytext_mini_x",
-  MINI_Y: "spotytext_mini_y",
-  HUD_X: "spotytext_record_hud_x",
-  HUD_Y: "spotytext_record_hud_y",
-  AUTHOR_ID: "spotytext_author_id"
+  FONT: "lyrify_ui_font_px",
+  BLUR: "lyrify_ui_blur_px",
+  BRIGHT: "lyrify_ui_brightness",
+  AUTO: "lyrify_ui_auto_scroll",
+  DEBUG: "lyrify_ui_show_debug",
+  FULLSCREEN: "lyrify_ui_fullscreen",
+  AUTOGEN: "lyrify_ui_autogen_sync",
+  LINE_GAP: "lyrify_ui_line_gap",
+  MAX_W: "lyrify_ui_max_width",
+  INACTIVE_OP: "lyrify_ui_inactive_op_pct",
+  EDGE_FADE: "lyrify_ui_edge_fade",
+  MINI_X: "lyrify_mini_x",
+  MINI_Y: "lyrify_mini_y",
+  HUD_X: "lyrify_record_hud_x",
+  HUD_Y: "lyrify_record_hud_y",
+  AUTHOR_ID: "lyrify_author_id"
 };
 
 export const DEFAULT_SETTINGS: Settings = {

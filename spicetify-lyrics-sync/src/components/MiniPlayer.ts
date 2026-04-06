@@ -14,10 +14,10 @@ export interface MiniPlayerOptions {
 }
 
 export function createMiniPlayer(options: MiniPlayerOptions = {}) {
-  const mini = h("div", { id: "spotytext-mini" });
-  const header = h("div", { id: "spotytext-mini-header" });
+  const mini = h("div", { id: "lyrify-mini" });
+  const header = h("div", { id: "lyrify-mini-header" });
   const title = h("span", {}, "Mini Player");
-  const closeBtn = h("button", { id: "spotytext-mini-close", className: "spotytext-mini-header-btn", title: "Close" });
+  const closeBtn = h("button", { id: "lyrify-mini-close", className: "lyrify-mini-header-btn", title: "Close" });
   closeBtn.innerHTML = SVG_CLOSE;
   closeBtn.onclick = (e) => {
       e.stopPropagation();
@@ -26,24 +26,24 @@ export function createMiniPlayer(options: MiniPlayerOptions = {}) {
 
   header.appendChild(title);
   header.appendChild(closeBtn);
-  const body = h("div", { id: "spotytext-mini-body" });
+  const body = h("div", { id: "lyrify-mini-body" });
   
-  const info = h("div", { className: "spotytext-mini-info" }, "-");
-  const scroll = h("div", { id: "spotytext-mini-scroll" });
-  const seek = h("div", { id: "spotytext-mini-seek" });
-  const actions = h("div", { id: "spotytext-mini-actions" });
+  const info = h("div", { className: "lyrify-mini-info" }, "-");
+  const scroll = h("div", { id: "lyrify-mini-scroll" });
+  const seek = h("div", { id: "lyrify-mini-seek" });
+  const actions = h("div", { id: "lyrify-mini-actions" });
   
-  const miniSeekCurrent = h("div", { className: "spotytext-mini-time" }, "0:00");
+  const miniSeekCurrent = h("div", { className: "lyrify-mini-time" }, "0:00");
   const miniSeekRange = h("input", { type: "range", min: "0", max: "1000", step: "1", value: "0" }) as HTMLInputElement;
-  const miniSeekTotal = h("div", { className: "spotytext-mini-time" }, "0:00");
+  const miniSeekTotal = h("div", { className: "lyrify-mini-time" }, "0:00");
   
   seek.appendChild(miniSeekCurrent);
   seek.appendChild(miniSeekRange);
   seek.appendChild(miniSeekTotal);
 
-  const miniPrev = h("button", { className: "spotytext-mini-icon-btn", title: "Previous" });
-  const miniPlay = h("button", { className: "spotytext-mini-icon-btn s-play", title: "Play / Pause" });
-  const miniNext = h("button", { className: "spotytext-mini-icon-btn", title: "Next" });
+  const miniPrev = h("button", { className: "lyrify-mini-icon-btn", title: "Previous" });
+  const miniPlay = h("button", { className: "lyrify-mini-icon-btn s-play", title: "Play / Pause" });
+  const miniNext = h("button", { className: "lyrify-mini-icon-btn", title: "Next" });
   
   miniPrev.innerHTML = SVG_PREV;
   miniPlay.innerHTML = SVG_PLAY;
@@ -56,7 +56,7 @@ export function createMiniPlayer(options: MiniPlayerOptions = {}) {
   let isAutoFollowEnabled = true;
   let ignoreProgrammaticScroll = false;
   
-  const jumpNowBtn = h("button", { id: "spotytext-mini-jump" }, "Go to current line");
+  const jumpNowBtn = h("button", { id: "lyrify-mini-jump" }, "Go to current line");
   jumpNowBtn.onclick = () => {
     isAutoFollowEnabled = true;
     const active = scroll.querySelector(".s-active") as HTMLElement;
@@ -183,7 +183,7 @@ export function createMiniPlayer(options: MiniPlayerOptions = {}) {
           lyrics.lines.forEach((l: any, i: number) => {
             if (!l.text) return;
             const div = h("div", {
-              className: "spotytext-mini-line",
+              className: "lyrify-mini-line",
               onclick: () => { 
                 isAutoFollowEnabled = true;
                 if (l.startTime !== null) (window as any).Spicetify.Player.seek(l.startTime); 

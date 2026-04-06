@@ -15,7 +15,7 @@ async function fetchPlainLyricsFallback(artist: string, title: string, signal?: 
 
 function getLyricaBaseUrl() {
   try {
-    const fromLs = localStorage.getItem("spotytext_lyrica_url")?.trim();
+    const fromLs = localStorage.getItem("lyrify_lyrica_url")?.trim();
     if (fromLs) return fromLs.replace(/\/+$/, "");
   } catch {
     // ignore
@@ -84,7 +84,7 @@ export async function fetchLyricsFromLrclib(params: {
 
   const debug = (() => {
     try {
-      return localStorage.getItem("spotytext_debug") === "1";
+      return localStorage.getItem("lyrify_debug") === "1";
     } catch {
       return false;
     }
@@ -93,7 +93,7 @@ export async function fetchLyricsFromLrclib(params: {
   const debugLog = (...args: any[]) => {
     if (!debug) return;
     // eslint-disable-next-line no-console
-    console.log("[spotytext]", ...args);
+    console.log("[lyrify]", ...args);
   };
 
   const url = new URL(LRCLIB_GET_URL);

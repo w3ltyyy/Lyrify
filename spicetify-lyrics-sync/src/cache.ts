@@ -1,6 +1,6 @@
 import type { LyricsModel } from "./syncModel";
 
-const CACHE_PREFIX = "spotytext_cache_";
+const CACHE_PREFIX = "lyrify_cache_";
 const MAX_CACHE_ENTRIES = 50;
 const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
 

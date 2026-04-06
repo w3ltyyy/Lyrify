@@ -1,5 +1,5 @@
 {
-  "name": "spotytext-backend",
+  "name": "lyrify-backend",
   "private": true,
   "type": "module",
   "dependencies": {

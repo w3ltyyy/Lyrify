@@ -100,7 +100,7 @@ export function tryClickSpotifyLyricsButton(): boolean {
     for (const btn of list) {
       if (!(btn instanceof HTMLButtonElement)) continue;
       if (btn.disabled) continue;
-      if (btn.id === "spotytext-inline-trigger") continue;
+      if (btn.id === "lyrify-inline-trigger") continue;
       const bar = btn.closest('[data-testid="now-playing-bar"], .Root__now-playing-bar');
       if (!bar) continue;
       btn.click();

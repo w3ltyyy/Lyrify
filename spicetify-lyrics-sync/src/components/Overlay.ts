@@ -12,31 +12,31 @@ export function createOverlay(options: {
   toggleMini: () => void;
   onClearCache: () => void;
 }) {
-  const overlay = h("div", { id: "spotytext-overlay", style: { display: "none" } });
-  const card = h("div", { id: "spotytext-card" });
+  const overlay = h("div", { id: "lyrify-overlay", style: { display: "none" } });
+  const card = h("div", { id: "lyrify-card" });
   
-  const header = h("div", { id: "spotytext-header" });
-  const headerTitleEl = h("div", { id: "spotytext-title" });
+  const header = h("div", { id: "lyrify-header" });
+  const headerTitleEl = h("div", { id: "lyrify-title" });
   
-  const headerRight = h("div", { id: "spotytext-header-right" });
-  const miniBtn = h("button", { id: "spotytext-mini-toggle" }, "Mini");
-  const settingsBtn = h("button", { id: "spotytext-settings-toggle", title: "Display settings" }, "⚙");
+  const headerRight = h("div", { id: "lyrify-header-right" });
+  const miniBtn = h("button", { id: "lyrify-mini-toggle" }, "Mini");
+  const settingsBtn = h("button", { id: "lyrify-settings-toggle", title: "Display settings" }, "⚙");
   
   headerRight.appendChild(miniBtn);
   headerRight.appendChild(settingsBtn);
   header.appendChild(headerTitleEl);
   header.appendChild(headerRight);
 
-  const body = h("div", { id: "spotytext-body" });
-  const meta = h("div", { id: "spotytext-meta" });
+  const body = h("div", { id: "lyrify-body" });
+  const meta = h("div", { id: "lyrify-meta" });
   
-  const scrollWrap = h("div", { id: "spotytext-scroll-wrap" });
-  const scrollInner = h("div", { id: "spotytext-scroll-inner" });
-  const linesEl = h("div", { id: "spotytext-lines" });
-  const jumpNowBtn = h("button", { id: "spotytext-jump-now", className: "spotytext-btn", style: { display: "none" } }, "Go to current line");
+  const scrollWrap = h("div", { id: "lyrify-scroll-wrap" });
+  const scrollInner = h("div", { id: "lyrify-scroll-inner" });
+  const linesEl = h("div", { id: "lyrify-lines" });
+  const jumpNowBtn = h("button", { id: "lyrify-jump-now", className: "lyrify-btn", style: { display: "none" } }, "Go to current line");
 
   const debugInfo = h("div", { 
-    id: "spotytext-debug-info", 
+    id: "lyrify-debug-info", 
     style: { 
         fontSize: "11px", 
         opacity: "0.5", 
@@ -55,7 +55,7 @@ export function createOverlay(options: {
   body.appendChild(debugInfo);
 
   body.appendChild(debugInfo);
-  const clearWave = h("div", { id: "spotytext-clear-wave" });
+  const clearWave = h("div", { id: "lyrify-clear-wave" });
   overlay.appendChild(clearWave);
 
   const handleSubmit = () => {
@@ -67,9 +67,9 @@ export function createOverlay(options: {
   const settingsPanel = createSettingsPanel(overlay, options.onClearCache, options.manual);
   const recordHud = createRecordHud(options.manual, handleSubmit, () => settingsPanel.syncSettings());
 
-  const vibrantBg = h("div", { id: "spotytext-vibrant-bg" });
+  const vibrantBg = h("div", { id: "lyrify-vibrant-bg" });
   for (let i = 0; i < 4; i++) {
-    const blob = h("div", { className: `spotytext-blob spotytext-blob-${i}` });
+    const blob = h("div", { className: `lyrify-blob lyrify-blob-${i}` });
     vibrantBg.appendChild(blob);
   }
 
@@ -84,14 +84,14 @@ export function createOverlay(options: {
 
   const applyAccentColor = async (imageUrl?: string) => {
     if (!imageUrl) {
-      overlay.style.setProperty("--spotytext-bg", "linear-gradient(180deg, #1c1c1c 0%, #121212 100%)");
-      overlay.style.setProperty("--spotytext-card-bg", "#171717");
-      overlay.style.setProperty("--spotytext-line-active-bg", "rgba(30,215,96,0.20)");
-      overlay.style.setProperty("--spotytext-accent-soft", "rgba(30,215,96,0.24)");
-      overlay.style.setProperty("--spotytext-accent-border", "rgba(30,215,96,0.72)");
-      overlay.style.setProperty("--spotytext-accent-text", "#d8ffe7");
-      overlay.style.setProperty("--spotytext-accent-strong", "rgba(30,215,96,1)");
-      overlay.style.setProperty("--spotytext-fade-edge", "rgba(23, 23, 23, 0.98)");
+      overlay.style.setProperty("--lyrify-bg", "linear-gradient(180deg, #1c1c1c 0%, #121212 100%)");
+      overlay.style.setProperty("--lyrify-card-bg", "#171717");
+      overlay.style.setProperty("--lyrify-line-active-bg", "rgba(30,215,96,0.20)");
+      overlay.style.setProperty("--lyrify-accent-soft", "rgba(30,215,96,0.24)");
+      overlay.style.setProperty("--lyrify-accent-border", "rgba(30,215,96,0.72)");
+      overlay.style.setProperty("--lyrify-accent-text", "#d8ffe7");
+      overlay.style.setProperty("--lyrify-accent-strong", "rgba(30,215,96,1)");
+      overlay.style.setProperty("--lyrify-fade-edge", "rgba(23, 23, 23, 0.98)");
       return;
     }
 
@@ -99,17 +99,17 @@ export function createOverlay(options: {
     if (!result) return;
     const { dominant, palette } = result;
     const { r, g, b } = dominant;
-    overlay.style.setProperty("--spotytext-bg", `linear-gradient(180deg, rgb(${Math.max(28, Math.floor(r * 0.42))}, ${Math.max(28, Math.floor(g * 0.42))}, ${Math.max(28, Math.floor(b * 0.42))}) 0%, #121212 100%)`);
+    overlay.style.setProperty("--lyrify-bg", `linear-gradient(180deg, rgb(${Math.max(28, Math.floor(r * 0.42))}, ${Math.max(28, Math.floor(g * 0.42))}, ${Math.max(28, Math.floor(b * 0.42))}) 0%, #121212 100%)`);
     const cr = Math.max(26, Math.floor(r * 0.32));
     const cg = Math.max(26, Math.floor(g * 0.32));
     const cb = Math.max(26, Math.floor(b * 0.32));
-    overlay.style.setProperty("--spotytext-card-bg", `rgba(${cr},${cg},${cb},0.96)`);
-    overlay.style.setProperty("--spotytext-line-active-bg", `rgba(${r},${g},${b},0.30)`);
-    overlay.style.setProperty("--spotytext-accent-soft", `rgba(${r},${g},${b},0.30)`);
-    overlay.style.setProperty("--spotytext-accent-border", `rgba(${r},${g},${b},0.88)`);
-    overlay.style.setProperty("--spotytext-accent-text", "#ffffff");
-    overlay.style.setProperty("--spotytext-accent-strong", `rgb(${r},${g},${b})`);
-    overlay.style.setProperty("--spotytext-fade-edge", `rgba(${cr},${cg},${cb},0.96)`);
+    overlay.style.setProperty("--lyrify-card-bg", `rgba(${cr},${cg},${cb},0.96)`);
+    overlay.style.setProperty("--lyrify-line-active-bg", `rgba(${r},${g},${b},0.30)`);
+    overlay.style.setProperty("--lyrify-accent-soft", `rgba(${r},${g},${b},0.30)`);
+    overlay.style.setProperty("--lyrify-accent-border", `rgba(${r},${g},${b},0.88)`);
+    overlay.style.setProperty("--lyrify-accent-text", "#ffffff");
+    overlay.style.setProperty("--lyrify-accent-strong", `rgb(${r},${g},${b})`);
+    overlay.style.setProperty("--lyrify-fade-edge", `rgba(${cr},${cg},${cb},0.96)`);
 
     // Vibrant blobs (use palette if available, else derive harmonious shifts)
     let c1 = rgbToHsl(r, g, b);
@@ -130,17 +130,17 @@ export function createOverlay(options: {
       });
     }
 
-    overlay.style.setProperty("--spotytext-color-1", `hsl(${c1[0]}, ${c1[1]}%, ${c1[2]}%)`);
-    overlay.style.setProperty("--spotytext-color-2", `hsl(${c2[0]}, ${c2[1]}%, ${c2[2]}%)`);
-    overlay.style.setProperty("--spotytext-color-3", `hsl(${c3[0]}, ${c3[1]}%, ${c3[2]}%)`);
-    overlay.style.setProperty("--spotytext-color-4", `hsl(${c4[0]}, ${c4[1]}%, ${c4[2]}%)`);
+    overlay.style.setProperty("--lyrify-color-1", `hsl(${c1[0]}, ${c1[1]}%, ${c1[2]}%)`);
+    overlay.style.setProperty("--lyrify-color-2", `hsl(${c2[0]}, ${c2[1]}%, ${c2[2]}%)`);
+    overlay.style.setProperty("--lyrify-color-3", `hsl(${c3[0]}, ${c3[1]}%, ${c3[2]}%)`);
+    overlay.style.setProperty("--lyrify-color-4", `hsl(${c4[0]}, ${c4[1]}%, ${c4[2]}%)`);
 
     // Fix fade edge for vibrant mode
-    const isVibrant = (window as any).spotytext_settings?.vibrant;
+    const isVibrant = (window as any).lyrify_settings?.vibrant;
     if (isVibrant) {
-      overlay.style.setProperty("--spotytext-fade-edge", `rgba(18, 18, 18, 0.5)`);
+      overlay.style.setProperty("--lyrify-fade-edge", `rgba(18, 18, 18, 0.5)`);
     } else {
-      overlay.style.setProperty("--spotytext-fade-edge", `rgba(${cr},${cg},${cb},0.96)`);
+      overlay.style.setProperty("--lyrify-fade-edge", `rgba(${cr},${cg},${cb},0.96)`);
     }
   };
 
@@ -244,7 +244,7 @@ export function createOverlay(options: {
     },
     render: (miniOpen: boolean) => {
       isMiniOpen = miniOpen;
-      const settings = (window as any).spotytext_settings || {};
+      const settings = (window as any).lyrify_settings || {};
       debugInfo.style.display = settings.showDebug ? "block" : "none";
 
       if (isMiniOpen) {
@@ -274,7 +274,7 @@ export function createOverlay(options: {
 
           lyrics.lines.forEach((l, i) => {
             const div = h("div", {
-              className: "spotytext-line",
+              className: "lyrify-line",
               onclick: () => {
                 isAutoFollowEnabled = true; // RE-ATTACH ON CLICK
                 ignoreProgrammaticScroll = true;

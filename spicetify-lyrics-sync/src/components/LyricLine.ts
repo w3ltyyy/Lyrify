@@ -12,7 +12,7 @@ export function createLyricLine(
   onClick: (idx: number) => void
 ): LyricLineComponent {
   const element = h("div", {
-    className: "spotytext-line",
+    className: "lyrify-line",
     textContent: line.text,
     tabIndex: -1,
     dataset: { index: String(index) },

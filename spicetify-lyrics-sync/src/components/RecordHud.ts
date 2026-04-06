@@ -4,11 +4,11 @@ import { formatMs } from "../utils";
 import { ManualSyncController } from "../manualSync";
 
 export function createRecordHud(manual: ManualSyncController, onSubmit?: () => void, onClose?: () => void) {
-  const hud = h("div", { id: "spotytext-record-hud" });
+  const hud = h("div", { id: "lyrify-record-hud" });
   
   // Header (Compact)
-  const header = h("div", { id: "spotytext-record-hud-header" }, "Sync Mode");
-  const closeBtn = h("button", { className: "spotytext-mini-header-btn", title: "Hide" }, [
+  const header = h("div", { id: "lyrify-record-hud-header" }, "Sync Mode");
+  const closeBtn = h("button", { className: "lyrify-mini-header-btn", title: "Hide" }, [
       hSvg("svg", { viewBox: "0 0 24 24", fill: "none" }, [
           hSvg("path", { d: "M18 6L6 18M6 6l12 12", stroke: "currentColor", "stroke-width": "2", "stroke-linecap": "round", fill: "none" })
       ])
@@ -16,27 +16,27 @@ export function createRecordHud(manual: ManualSyncController, onSubmit?: () => v
   header.appendChild(closeBtn);
 
   // Info
-  const trackNameEl = h("div", { id: "spotytext-record-hud-track" }, "Loading...");
-  const statusEl = h("div", { id: "spotytext-record-hud-status" });
+  const trackNameEl = h("div", { id: "lyrify-record-hud-track" }, "Loading...");
+  const statusEl = h("div", { id: "lyrify-record-hud-status" });
 
-  const body = h("div", { id: "spotytext-record-hud-body" });
+  const body = h("div", { id: "lyrify-record-hud-body" });
   
   // Single Focus Line
-  const lineCurrent = h("div", { id: "spotytext-record-hud-line" }, "...");
+  const lineCurrent = h("div", { id: "lyrify-record-hud-line" }, "...");
 
   // Control Row
-  const actions = h("div", { id: "spotytext-record-hud-actions" });
-  const undoBtn = h("button", { className: "spotytext-btn", style: { padding: "4px 10px" }, title: "Undo (Backspace)" }, "Undo");
-  const submitBtn = h("button", { className: "spotytext-btn", style: { padding: "4px 10px", fontWeight: "700", borderColor: "var(--spotytext-accent-strong)" }, title: "Submit for review" }, "Submit");
-  const counter = h("div", { id: "spotytext-record-hud-counter" }, "0 / 0");
+  const actions = h("div", { id: "lyrify-record-hud-actions" });
+  const undoBtn = h("button", { className: "lyrify-btn", style: { padding: "4px 10px" }, title: "Undo (Backspace)" }, "Undo");
+  const submitBtn = h("button", { className: "lyrify-btn", style: { padding: "4px 10px", fontWeight: "700", borderColor: "var(--lyrify-accent-strong)" }, title: "Submit for review" }, "Submit");
+  const counter = h("div", { id: "lyrify-record-hud-counter" }, "0 / 0");
 
   actions.appendChild(undoBtn);
   actions.appendChild(submitBtn);
   actions.appendChild(counter);
 
-  const hint = h("div", { id: "spotytext-record-hud-hint" }, "Enter/Space to capture");
-  const toast = h("div", { id: "spotytext-record-hud-toast" }, "Saved");
-  const list = h("div", { id: "spotytext-record-hud-list" });
+  const hint = h("div", { id: "lyrify-record-hud-hint" }, "Enter/Space to capture");
+  const toast = h("div", { id: "lyrify-record-hud-toast" }, "Saved");
+  const list = h("div", { id: "lyrify-record-hud-list" });
 
   body.appendChild(lineCurrent);
   body.appendChild(actions);
@@ -92,7 +92,7 @@ export function createRecordHud(manual: ManualSyncController, onSubmit?: () => v
           await onSubmit();
           showToast("Submitted!");
       } else {
-          const btn = document.getElementById("spotytext-submit");
+          const btn = document.getElementById("lyrify-submit");
           if (btn) {
               btn.click();
               showToast("Submitted!");
@@ -120,11 +120,11 @@ export function createRecordHud(manual: ManualSyncController, onSubmit?: () => v
         .reverse()
         .forEach((l) => {
             const item = h("div", { 
-                className: "spotytext-record-hud-item",
+                className: "lyrify-record-hud-item",
                 onclick: () => (window as any).Spicetify.Player.seek(l.startTime)
             });
             item.appendChild(h("div", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", pointerEvents: "none" } }, l.text));
-            item.appendChild(h("div", { className: "spotytext-record-hud-item-time", style: { pointerEvents: "none" } }, formatMs(l.startTime!)));
+            item.appendChild(h("div", { className: "lyrify-record-hud-item-time", style: { pointerEvents: "none" } }, formatMs(l.startTime!)));
             list.appendChild(item);
         });
   };

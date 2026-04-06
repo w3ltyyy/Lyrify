@@ -162,7 +162,7 @@ async function startExtension() {
                 overlay.showRecordHud();
             },
             onStop: () => {
-                const hud = document.getElementById("spotytext-record-hud");
+                const hud = document.getElementById("lyrify-record-hud");
                 if (hud) hud.classList.remove("s-open");
             }
         });
@@ -241,7 +241,7 @@ async function startExtension() {
                 overlay.render(miniOpen);
             }
         });
-        if (!document.getElementById("spotytext-mini")) {
+        if (!document.getElementById("lyrify-mini")) {
             document.body.appendChild(miniPlayer.element);
         }
 
@@ -278,7 +278,7 @@ async function startExtension() {
         };
 
         const updateTriggerButtonState = (isOpen: boolean) => {
-            const btn = document.getElementById("spotytext-inline-trigger");
+            const btn = document.getElementById("lyrify-inline-trigger");
             if (btn) btn.classList.toggle("s-active", isOpen);
         };
 
@@ -515,8 +515,8 @@ async function startExtension() {
                     if (getComputedStyle(target).position === "static") {
                         target.style.position = "relative";
                     }
-                    const host = document.getElementById("spotytext-host") || document.createElement("div");
-                    host.id = "spotytext-host";
+                    const host = document.getElementById("lyrify-host") || document.createElement("div");
+                    host.id = "lyrify-host";
                     if (host.parentElement !== target) target.appendChild(host);
                     if (overlay.element.parentElement !== host) host.appendChild(overlay.element);
                     break;
@@ -581,13 +581,13 @@ async function startExtension() {
 
     } catch (err) {
         // eslint-disable-next-line no-console
-        console.error("[spotytext] Startup failed:", err);
+        console.error("[lyrify] Startup failed:", err);
         isStarted = false;
     }
 }
 
-(window as any).spotytext_settings = readUiSettings();
-(window as any).__spotytext_start = startExtension;
+(window as any).lyrify_settings = readUiSettings();
+(window as any).__lyrify_start = startExtension;
 
 if ((window as any).Spicetify?.Player) {
     setTimeout(startExtension, 500);
