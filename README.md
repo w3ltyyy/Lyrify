@@ -5,84 +5,130 @@
 ---
 
 <a name="russian"></a>
-## 🇷🇺 Русская версия
+# 🇷🇺 Lyrify: Синхронизация текста для Spotify
 
-**Lyrify** — это мощное расширение для синхронизации текста песен в **Spotify** (через **Spicetify**). Оно позволяет просматривать качественные синхронизированные тексты и вносить вклад в открытую базу данных таймкодов.
+**Lyrify** — это профессиональное расширение для **Spotify** (через **Spicetify**), которое превращает прослушивание музыки в интерактивный опыт. Оно предоставляет не только качественные синхронизированные тексты, но и полноценную инфраструктуру для их создания и модерации.
 
-### ✨ Особенности
+---
 
-- **Синхронизация в реальном времени**: Плавная прокрутка текста, которая идеально следует за музыкой.
-- **Режим записи (Recording HUD)**: Минималистичный и производительный интерфейс для ручного захвата таймкодов любой песни.
-- **Открытый вклад**: Отправляйте свои синхронизированные тексты на модерацию в центральное API для общего использования.
-- **Премиальный дизайн**: Современный интерфейс с эффектами размытия (Glassmorphism) и микро-анимациями, которые идеально вписываются в эстетику Spotify.
-- **Умное кэширование**: Мгновенная загрузка ранее просмотренных текстов.
+### ✨ Ключевые возможности
 
-### 🛠️ Установка
+- **Синхронизация в реальном времени**: Текст плавно прокручивается и подсвечивается в такт музыке.
+- **Recording HUD (Режим записи)**: Уникальный интерфейс для создания таймкодов «на лету». Просто нажимайте клавишу при смене строки.
+- **Премиальный дизайн**:
+  - Эффект матового стекла (**Glassmorphism**).
+  - Динамические живые фоны, подстраивающиеся под обложку альбома.
+  - Гибкая настройка: размер шрифта, размытие, яркость и отступы.
+- **Производительный бэкенд**: Сервер на **Node.js** с базой данных **SQLite (WAL mode)** для мгновенного отклика.
+- **Умное кэширование**: Минимум сетевых запросов благодаря продвинутой системе хранения в браузере.
 
-#### 1. Настройка Бэкенда (API)
-Бэкенд хранит синхронизированные тексты в локальной базе данных SQLite.
+---
 
-```bash
-cd backend
-npm install
-node server.js
-```
+### 🚀 Быстрый старт
 
-#### 2. Установка расширения Spicetify
-1. Убедитесь, что у вас установлен **Spicetify-cli**.
+#### 1. Подготовка Бэкенда
+Сервер хранит тексты и обрабатывает запросы от расширения.
+
+1. Установите зависимости:
+   ```bash
+   cd backend
+   npm install
+   ```
+2. Запустите сервер:
+   ```bash
+   node server.js
+   ```
+   *По умолчанию API доступно на `http://localhost:8080`.*
+
+#### 2. Установка расширения Lyrify
+1. Убедитесь, что у вас установлен [Spicetify-cli](https://spicetify.app/).
 2. Перейдите в папку расширения: `cd spicetify-lyrics-sync`.
-3. Соберите и установите: `./scripts/build-and-install-spicetify-extension.sh`.
-4. Примените изменения: `spicetify apply`.
+3. Запустите скрипт сборки:
+   ```bash
+   ./scripts/build-and-install-spicetify-extension.sh
+   ```
+4. Примените изменения в Spotify:
+   ```bash
+   spicetify apply
+   ```
 
-### 🎧 Как пользоваться: Режим записи
-Чтобы синхронизировать новую песню:
-1. Нажмите на иконку **Lyrify** в плеере.
-2. Включите **Recording Mode** (в настройках или через HUD).
-3. Нажимайте **`[Space]`** или **`[Enter]`**, чтобы зафиксировать начало текущей строки под музыку.
-4. После завершения нажмите **Submit**, чтобы отправить результат в базу.
+---
+
+### 🎧 Инструкция по синхронизации (Recording Mode)
+Если вы нашли песню без текста:
+1. Откройте окно **Lyrify** и перейдите в **Settings** (Настройки).
+2. Вкладка **Sync** -> Включите **Recording Mode**.
+3. Наверху появится **HUD** (информационная панель).
+4. Во время игры песни нажимайте **`[Space]`** или **`[Enter]`** в момент начала новой строки.
+5. Нажмите **`[V]`** или иконку галочки, чтобы отправить текст на сервер.
+
+---
+
+### 📂 Добавление медиа
+Чтобы добавить скриншоты в этот файл:
+1. Создайте папку `assets` в корне проекта.
+2. Поместите туда изображения (например, `main_view.png`, `settings.png`).
+3. Добавьте их в Markdown: `![Settings](assets/settings.png)`.
 
 ---
 
 <a name="english"></a>
-## 🇺🇸 English Version
+# 🇺🇸 Lyrify: Professional Lyrics Sync for Spotify
 
-**Lyrify** is a professional lyrics synchronization extension for **Spotify** (via **Spicetify**). It provides high-quality synced lyrics and a robust infrastructure for contributing to an open database of timecodes.
-
-### ✨ Features
-
-- **Real-time Sync**: Smoothly scrolling lyrics with pixel-perfect tracking.
-- **Recording HUD**: A minimalist, high-performance interface to manually capture timecodes for any song.
-- **Contribution Workflow**: Submit your synchronized masterpiece to a central API for moderation and public use.
-- **Modern Aesthetics**: Glassmorphism, blurred background blobs, and smooth transitions tailored for a premium Spotify experience.
-- **Persistent Cache**: Fast loading times with intelligent local caching.
-
-### 🚀 Getting Started
-
-#### 1. Backend Setup
-The backend serves synchronized lyrics from a local SQLite database.
-
-```bash
-cd backend
-npm install
-node server.js
-```
-
-#### 2. Spicetify Extension Installation
-1. Ensure **Spicetify-cli** is installed.
-2. Navigate to the extension directory: `cd spicetify-lyrics-sync`.
-3. Build and install: `./scripts/build-and-install-spicetify-extension.sh`.
-4. Apply changes: `spicetify apply`.
-
-### 📂 Adding Media (Screenshots & Video)
-To add your own media to this README:
-1. Create a folder named `assets` in the root directory.
-2. Place your photos (`view.png`, `hud.png`) or GIFs/videos there.
-3. Reference them in Markdown: `![Description](assets/filename.png)`.
+**Lyrify** is a high-performance **Spotify** extension (via **Spicetify**) designed for audiophiles who value accuracy and aesthetics. it offers a complete ecosystem for viewing, recording, and moderating synchronized lyrics.
 
 ---
 
-## 🤝 Contributing
-Contributions are welcome! If you have ideas for new features or bug fixes, feel free to open a Pull Request on [GitHub](https://github.com/w3ltyyy/Lyrify).
+### ✨ Features at a Glance
 
-## 📄 License
-Licensed under the MIT License.
+- **Pixel-Perfect Sync**: Smoothly scrolling lyrics with sub-millisecond precision.
+- **High-Performance Recording HUD**: A specialized interface for manual synchronization. Record timecodes using your keyboard in real-time.
+- **State-of-the-Art Design**:
+  - Integrated **Glassmorphism** and vibrant background effects.
+  - Fully responsive typography (font size, line spacing, max width).
+  - Dynamic accent colors derived from track artwork.
+- **Robust Architecture**:
+  - **Backend**: Node.js API powered by **SQLite** with Write-Ahead Logging (WAL).
+  - **Contribution**: Built-in submission system for community-driven lyrics updates.
+- **Smart Fallbacks**: Automatically fetches from **LRCLIB**, **Spotify API**, or native DOM scraping.
+
+---
+
+### 🚀 Installation Guide
+
+#### 1. Backend Service
+The central hub for data storage and moderation.
+
+1. Install dependencies:
+   ```bash
+   cd backend
+   npm install
+   ```
+2. Start the service:
+   ```bash
+   node server.js
+   ```
+   *The API runs on port `8080` by default.*
+
+#### 2. Extension Deployment
+1. Ensure [Spicetify-cli](https://spicetify.app/) is configured.
+2. Navigate to the extension folder: `cd spicetify-lyrics-sync`.
+3. Run the automated deployment script:
+   ```bash
+   ./scripts/build-and-install-spicetify-extension.sh
+   ```
+4. Activate the extension:
+   ```bash
+   spicetify apply
+   ```
+
+---
+
+### ⚙️ Configuration & Customization
+Lyrify allows deep customization through its settings panel:
+- **General**: Text size (22px-52px), Background blur, Brightness.
+- **Appearance**: Line spacing, Column width, Inactive line dimming.
+- **Sync**: Auto-generation of timings, Recording Mode toggle.
+
+### 📄 License
+This project is licensed under the **MIT License**.
