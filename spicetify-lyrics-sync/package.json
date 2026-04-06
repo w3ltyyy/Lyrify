@@ -1,0 +1,14 @@
+{
+  "name": "spicetify-lyrics-sync",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --outfile=dist/lyrics-sync.js --format=iife --platform=browser --sourcemap --target=es2018",
+    "watch": "esbuild src/index.ts --bundle --outfile=dist/lyrics-sync.js --format=iife --platform=browser --sourcemap --target=es2018 --watch",
+    "install": "../scripts/build-and-install-spicetify-extension.sh"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}
+

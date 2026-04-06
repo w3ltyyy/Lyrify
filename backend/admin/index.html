@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spotytext Admin</title>
+    <style>
+      :root {
+        --bg: #0f1115;
+        --panel: #171a21;
+        --line: #2a3040;
+        --text: #e9edf3;
+        --muted: #a7b1c2;
+        --ok: #1ed760;
+        --warn: #ffb020;
+        --bad: #ff5a5a;
+        --accent: #58a6ff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        background: radial-gradient(1200px 500px at 30% -10%, #1d2433 0%, var(--bg) 48%);
+        color: var(--text);
+      }
+      .app {
+        max-width: 1200px;
+        margin: 24px auto;
+        padding: 0 16px 24px;
+      }
+      .top {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .title {
+        font-size: 24px;
+        font-weight: 800;
+        margin-right: auto;
+      }
+      .card {
+        background: color-mix(in srgb, var(--panel) 92%, black);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 12px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 12px;
+      }
+      @media (max-width: 980px) {
+        .grid { grid-template-columns: 1fr; }
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      input, select, button {
+        border-radius: 9px;
+        border: 1px solid var(--line);
+        background: #10131a;
+        color: var(--text);
+        padding: 8px 10px;
+        font-size: 13px;
+      }
+      button { cursor: pointer; }
+      button.primary {
+        background: color-mix(in srgb, var(--accent) 22%, #10131a);
+        border-color: color-mix(in srgb, var(--accent) 50%, var(--line));
+      }
+      button.ok {
+        background: color-mix(in srgb, var(--ok) 20%, #10131a);
+        border-color: color-mix(in srgb, var(--ok) 45%, var(--line));
+      }
+      button.bad {
+        background: color-mix(in srgb, var(--bad) 20%, #10131a);
+        border-color: color-mix(in srgb, var(--bad) 45%, var(--line));
+      }
+      .muted { color: var(--muted); font-size: 12px; }
+      .list {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 68vh;
+        overflow: auto;
+      }
+      .item {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 10px;
+        background: #12161f;
+      }
+      .item-top {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .item-top .key {
+        font-weight: 700;
+        font-size: 13px;
+        margin-right: auto;
+      }
+      .badge {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 2px 8px;
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .preview {
+        margin-top: 8px;
+        font-size: 12px;
+        color: #dce3ef;
+      }
+      .lines {
+        margin-top: 8px;
+        max-height: 220px;
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 6px;
+      }
+      .line {
+        display: flex;
+        gap: 8px;
+        padding: 5px 6px;
+        border-radius: 8px;
+      }
+      .line:hover { background: #1b2230; }
+      .line .t {
+        color: var(--muted);
+        min-width: 56px;
+        font-variant-numeric: tabular-nums;
+      }
+      .empty { padding: 20px; text-align: center; color: var(--muted); }
+      .kpi {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .kpi .box {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px;
+        background: #12161f;
+      }
+      .kpi .n { font-weight: 800; font-size: 20px; }
+      .toast {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        background: #111822;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px 12px;
+        display: none;
+      }
+      .toast.show { display: block; }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="top">
+        <div class="title">Spotytext Admin</div>
+        <span class="muted">Moderation dashboard for submissions and published sync</span>
+      </div>
+
+      <div class="card row" style="margin-bottom: 12px">
+        <label class="muted">Backend URL</label>
+        <input id="baseUrl" style="min-width: 280px" />
+        <label class="muted">Admin token</label>
+        <input id="token" type="password" placeholder="optional" />
+        <button id="saveCfg">Save</button>
+        <button class="primary" id="reloadBtn">Reload</button>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="row">
+            <select id="status">
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="all">All</option>
+            </select>
+            <input id="query" placeholder="Search by trackKey or author..." />
+            <button id="expandAll">Expand all</button>
+            <button id="collapseAll">Collapse all</button>
+          </div>
+          <div id="list" class="list"></div>
+        </div>
+
+        <div class="card">
+          <div class="kpi">
+            <div class="box"><div class="muted">Pending</div><div id="kPending" class="n">0</div></div>
+            <div class="box"><div class="muted">Approved</div><div id="kApproved" class="n">0</div></div>
+            <div class="box"><div class="muted">Rejected</div><div id="kRejected" class="n">0</div></div>
+          </div>
+          <div style="margin-top: 10px" class="muted">
+            Tips:
+            <br />- Approve pushes lines to shared `/sync`.
+            <br />- Reject keeps history but hides from pending.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+      const qs = (s) => document.querySelector(s);
+      const listEl = qs("#list");
+      const baseEl = qs("#baseUrl");
+      const tokenEl = qs("#token");
+      const statusEl = qs("#status");
+      const queryEl = qs("#query");
+      const toastEl = qs("#toast");
+      const kPending = qs("#kPending");
+      const kApproved = qs("#kApproved");
+      const kRejected = qs("#kRejected");
+
+      const LS_BASE = "spoty_admin_base";
+      const LS_TOKEN = "spoty_admin_token";
+      baseEl.value = localStorage.getItem(LS_BASE) || location.origin;
+      tokenEl.value = localStorage.getItem(LS_TOKEN) || "";
+
+      let cache = [];
+      let expanded = new Set();
+
+      const fmtMs = (ms) => {
+        if (typeof ms !== "number") return "--:--";
+        const s = Math.max(0, Math.floor(ms / 1000));
+        const m = Math.floor(s / 60);
+        const sec = String(s % 60).padStart(2, "0");
+        return `${m}:${sec}`;
+      };
+      const toast = (text) => {
+        toastEl.textContent = text;
+        toastEl.classList.add("show");
+        setTimeout(() => toastEl.classList.remove("show"), 1600);
+      };
+      const apiUrl = (path) => {
+        const u = new URL(path, baseEl.value);
+        const token = tokenEl.value.trim();
+        if (token) u.searchParams.set("token", token);
+        return u;
+      };
+
+      async function fetchJson(url, options) {
+        const r = await fetch(url, options);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return await r.json();
+      }
+
+      async function loadStats() {
+        const [p, a, r] = await Promise.all([
+          fetchJson(apiUrl("/submissions?status=pending&limit=1")),
+          fetchJson(apiUrl("/submissions?status=approved&limit=1")),
+          fetchJson(apiUrl("/submissions?status=rejected&limit=1"))
+        ]);
+        kPending.textContent = String((p.submissions || []).length || 0);
+        kApproved.textContent = String((a.submissions || []).length || 0);
+        kRejected.textContent = String((r.submissions || []).length || 0);
+      }
+
+      async function loadList() {
+        listEl.innerHTML = '<div class="empty">Loading...</div>';
+        try {
+          const status = statusEl.value;
+          const json = await fetchJson(apiUrl(`/submissions?status=${encodeURIComponent(status)}&limit=200`));
+          cache = Array.isArray(json.submissions) ? json.submissions : [];
+          renderList();
+          await loadStats();
+        } catch (e) {
+          listEl.innerHTML = `<div class="empty">Failed to load: ${e.message}</div>`;
+        }
+      }
+
+      async function moderate(id, action) {
+        const endpoint = action === "approve" ? "/submissions/approve" : "/submissions/reject";
+        try {
+          await fetchJson(apiUrl(endpoint), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id })
+          });
+          toast(action === "approve" ? "Approved" : "Rejected");
+          await loadList();
+        } catch (e) {
+          toast(`${action} failed: ${e.message}`);
+        }
+      }
+
+      function renderList() {
+        const q = queryEl.value.trim().toLowerCase();
+        const filtered = cache.filter((s) => {
+          if (!q) return true;
+          const hay = `${s.trackKey || ""} ${s.authorId || ""}`.toLowerCase();
+          return hay.includes(q);
+        });
+        if (!filtered.length) {
+          listEl.innerHTML = '<div class="empty">No submissions</div>';
+          return;
+        }
+        listEl.innerHTML = "";
+        filtered.forEach((s) => {
+          const item = document.createElement("div");
+          item.className = "item";
+          const top = document.createElement("div");
+          top.className = "item-top";
+
+          const key = document.createElement("div");
+          key.className = "key";
+          key.textContent = s.trackKey || "(unknown)";
+          top.appendChild(key);
+
+          const badge = document.createElement("span");
+          badge.className = "badge";
+          badge.textContent = s.status || "pending";
+          top.appendChild(badge);
+
+          if (s.status === "pending") {
+            const ok = document.createElement("button");
+            ok.className = "ok";
+            ok.textContent = "Approve";
+            ok.onclick = () => moderate(s.id, "approve");
+            const bad = document.createElement("button");
+            bad.className = "bad";
+            bad.textContent = "Reject";
+            bad.onclick = () => moderate(s.id, "reject");
+            top.appendChild(ok);
+            top.appendChild(bad);
+          }
+
+          const toggle = document.createElement("button");
+          const isOpen = expanded.has(s.id);
+          toggle.textContent = isOpen ? "Hide lines" : "Show lines";
+          toggle.onclick = () => {
+            if (expanded.has(s.id)) expanded.delete(s.id);
+            else expanded.add(s.id);
+            renderList();
+          };
+          top.appendChild(toggle);
+          item.appendChild(top);
+
+          const info = document.createElement("div");
+          info.className = "preview";
+          const first = (s.lines || []).find((x) => x && x.text)?.text || "(no text)";
+          info.textContent = `Author: ${s.authorId || "unknown"} | Lines: ${(s.lines || []).length} | First: "${first.slice(0, 90)}"`;
+          item.appendChild(info);
+
+          if (isOpen) {
+            const lines = document.createElement("div");
+            lines.className = "lines";
+            (s.lines || []).forEach((ln) => {
+              const row = document.createElement("div");
+              row.className = "line";
+              const t = document.createElement("div");
+              t.className = "t";
+              t.textContent = fmtMs(ln.startTime);
+              const txt = document.createElement("div");
+              txt.textContent = ln.text || "(empty)";
+              row.appendChild(t);
+              row.appendChild(txt);
+              lines.appendChild(row);
+            });
+            item.appendChild(lines);
+          }
+          listEl.appendChild(item);
+        });
+      }
+
+      qs("#reloadBtn").onclick = loadList;
+      qs("#saveCfg").onclick = () => {
+        localStorage.setItem(LS_BASE, baseEl.value.trim());
+        localStorage.setItem(LS_TOKEN, tokenEl.value);
+        toast("Saved config");
+      };
+      qs("#expandAll").onclick = () => {
+        expanded = new Set(cache.map((x) => x.id));
+        renderList();
+      };
+      qs("#collapseAll").onclick = () => {
+        expanded.clear();
+        renderList();
+      };
+      statusEl.onchange = loadList;
+      queryEl.oninput = renderList;
+
+      loadList();
+    </script>
+  </body>
+</html>
