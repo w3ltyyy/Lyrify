@@ -33,7 +33,11 @@
 
 ### 📺 Video Demo
 
-![Lyrify Demo](https://github.com/user-attachments/assets/c4890b7b-1ff3-43d0-8ac4-1805d3845c11)
+<p align="center">
+  <video src="https://github.com/user-attachments/assets/c4890b7b-1ff3-43d0-8ac4-1805d3845c11" controls="controls" style="max-width: 100%;">
+    Your browser does not support the video tag.
+  </video>
+</p>
 
 ---
 
