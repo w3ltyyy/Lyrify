@@ -14,23 +14,6 @@
 
 **Lyrify** is a high-performance **Spotify** extension (via **Spicetify**) designed for audiophiles who value accuracy and aesthetics. It offers a complete ecosystem for viewing, recording, and moderating synchronized lyrics.
 
----
-
-### ✨ Features at a Glance
-
-- **Pixel-Perfect Sync**: Smoothly scrolling lyrics with sub-millisecond precision.
-- **High-Performance Recording HUD**: A specialized interface for manual synchronization. Record timecodes using your keyboard in real-time.
-- **Modern Aesthetics**:
-  - Integrated **Glassmorphism** and dynamic background effects.
-  - Fully responsive typography (font size, line spacing, max width).
-  - Dynamic accent colors derived from track artwork.
-- **Robust Architecture**:
-  - **Backend**: Node.js API powered by **SQLite** with Write-Ahead Logging (WAL).
-  - **Contribution**: Built-in submission system for community-driven lyrics updates.
-- **Smart Fallbacks**: Automatically fetches from **LRCLIB**, **Spotify API**, or native DOM scraping.
-
----
-
 ### 📺 Video Demo
 
 <p align="center">
@@ -38,6 +21,10 @@
     Your browser does not support the video tag.
   </video>
 </p>
+
+---
+
+### ✨ Features at a Glance
 
 ---
 
