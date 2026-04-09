@@ -571,10 +571,13 @@ export const STYLES = `
       overflow-y: auto;
       overflow-x: hidden;
       padding: 12px 4px 24px;
-      scrollbar-gutter: stable;
+      scrollbar-width: none;
       mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
       -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
       transition: mask-image 0.2s ease, -webkit-mask-image 0.2s ease;
+    }
+    #lyrify-scroll-inner::-webkit-scrollbar {
+      display: none;
     }
     #lyrify-scroll-inner.s-no-mask-top {
       mask-image: linear-gradient(to bottom, black 0%, black 85%, transparent 100%);
@@ -629,6 +632,10 @@ export const STYLES = `
       opacity: 1;
       transform: translateY(0) scale(1.015);
       background: var(--lyrify-line-active-bg, rgba(255,255,255,0.08));
+    }
+    #lyrify-overlay:not(.s-highlight-enabled) .lyrify-line.s-active {
+      background: transparent;
+      transform: none;
     }
     .lyrify-line.s-record {
       opacity: 1;

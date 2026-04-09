@@ -245,7 +245,10 @@ async function startExtension() {
             document.body.appendChild(miniPlayer.element);
         }
 
-        const observer = createPlayerObserver((newUri) => loadLyrics(false, 0, newUri));
+        const observer = createPlayerObserver((newUri) => {
+            overlay.resetFollow();
+            loadLyrics(false, 0, newUri);
+        });
 
         const updateHighlight = () => {
             if (manual.isRecording()) return;
@@ -309,6 +312,7 @@ async function startExtension() {
             const relaxedKey = toTrackKey(info.artist, info.title);
 
             if (signal.aborted) return;
+            overlay.resetFollow();
             overlay.setHeader(`${info.artist} — ${info.title}`);
             overlay.updateRecordHudTrack(`${info.artist} — ${info.title}`, false); 
             overlay.applyAccentColor(info.imageUrl);

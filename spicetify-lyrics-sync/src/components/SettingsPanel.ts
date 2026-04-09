@@ -13,6 +13,7 @@ export const LS_UI_MAX_W = "lyrify_ui_max_width";
 export const LS_UI_INACTIVE_OP = "lyrify_ui_inactive_op_pct";
 export const LS_UI_EDGE_FADE = "lyrify_ui_edge_fade";
 export const LS_UI_VIBRANT = "lyrify_ui_vibrant";
+export const LS_UI_HIGHLIGHT_ACTIVE = "lyrify_ui_highlight_active";
 export const LS_CONTRIBUTOR_NICKNAME = "lyrify_contributor_nickname";
 
 export function readUiSettings() {
@@ -29,11 +30,12 @@ export function readUiSettings() {
     inactiveOpacityPct: Math.min(55, Math.max(15, Number(localStorage.getItem(LS_UI_INACTIVE_OP) || "38") || 38)),
     edgeFade: localStorage.getItem(LS_UI_EDGE_FADE) !== "0",
     vibrant: localStorage.getItem(LS_UI_VIBRANT) === "1",
+    highlightActive: localStorage.getItem(LS_UI_HIGHLIGHT_ACTIVE) !== "0",
     nickname: localStorage.getItem(LS_CONTRIBUTOR_NICKNAME) || ""
   };
 }
 
-export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: () => void, manualSync?: ManualSyncController) {
+export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: () => void, manualSync?: ManualSyncController, onLayoutChange?: (ignore: boolean) => void) {
   const panel = h("div", { id: "lyrify-settings-panel" });
   
   const title = h("div", { id: "lyrify-settings-title" }, "Display settings");
@@ -82,6 +84,7 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
   const edgeFadeCb = h("input", { type: "checkbox" }) as HTMLInputElement;
   const vibrantCb = h("input", { type: "checkbox" }) as HTMLInputElement;
   const recordCb = h("input", { type: "checkbox" }) as HTMLInputElement;
+  const highlightActiveCb = h("input", { type: "checkbox" }) as HTMLInputElement;
 
   const lineGapRange = h("input", { type: "range", min: "8", max: "28", step: "1" }) as HTMLInputElement;
   const lineGapVal = h("span", { className: "lyrify-setting-val" });
@@ -108,6 +111,7 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
   appearanceSection.appendChild(row("Inactive dim", inactiveOpRange, inactiveOpVal));
   appearanceSection.appendChild(row("Edge fade", edgeFadeCb, h("span")));
   appearanceSection.appendChild(row("Vibrant backgrounds", vibrantCb, h("span")));
+  appearanceSection.appendChild(row("Highlight active line", highlightActiveCb, h("span")));
 
   syncSection.appendChild(h("div", { className: "lyrify-settings-subtitle" }, "Sync engine"));
   syncSection.appendChild(row("Auto-generate", autogenCb, h("span")));
@@ -145,6 +149,7 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
     autogenCb.checked = s.autoGenerate;
     edgeFadeCb.checked = s.edgeFade;
     vibrantCb.checked = s.vibrant;
+    highlightActiveCb.checked = s.highlightActive;
     lineGapRange.value = String(s.lineGapPx);
     lineGapVal.textContent = `${s.lineGapPx}px`;
     maxWidthRange.value = String(s.maxWidthPx);
@@ -164,6 +169,7 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
         target.style.setProperty("--lyrify-line-dim-opacity", String(s.inactiveOpacityPct / 100));
         target.classList.toggle("s-fullscreen", s.fullscreen);
         target.classList.toggle("s-vibrant-enabled", s.vibrant);
+        target.classList.toggle("s-highlight-enabled", s.highlightActive);
         
         const scrollWrap = target.querySelector("#lyrify-scroll-wrap") || document.getElementById("lyrify-scroll-wrap");
         if (scrollWrap instanceof HTMLElement) scrollWrap.classList.toggle("s-fade-disabled", !s.edgeFade);
@@ -183,17 +189,20 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
     localStorage.setItem(LS_UI_AUTOGEN, autogenCb.checked ? "1" : "0");
     localStorage.setItem(LS_UI_EDGE_FADE, edgeFadeCb.checked ? "1" : "0");
     localStorage.setItem(LS_UI_VIBRANT, vibrantCb.checked ? "1" : "0");
+    localStorage.setItem(LS_UI_HIGHLIGHT_ACTIVE, highlightActiveCb.checked ? "1" : "0");
     localStorage.setItem(LS_UI_LINE_GAP, lineGapRange.value);
     localStorage.setItem(LS_UI_MAX_W, maxWidthRange.value);
     localStorage.setItem(LS_UI_INACTIVE_OP, inactiveOpRange.value);
     localStorage.setItem(LS_CONTRIBUTOR_NICKNAME, nicknameInput.value.trim());
     
     (window as any).lyrify_settings = readUiSettings();
+    if (onLayoutChange) onLayoutChange(true);
     syncSettingsControls();
+    if (onLayoutChange) setTimeout(() => onLayoutChange(false), 500);
   };
 
   [fontRange, blurRange, brightRange, lineGapRange, maxWidthRange, inactiveOpRange].forEach(input => input.oninput = persist);
-  [autoScrollCb, showDebugCb, fullscreenCb, autogenCb, edgeFadeCb, vibrantCb].forEach(cb => cb.onchange = persist);
+  [autoScrollCb, showDebugCb, fullscreenCb, autogenCb, edgeFadeCb, vibrantCb, highlightActiveCb].forEach(cb => cb.onchange = persist);
   nicknameInput.oninput = persist;
 
   recordCb.onchange = () => {

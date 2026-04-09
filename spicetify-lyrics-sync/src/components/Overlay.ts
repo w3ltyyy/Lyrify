@@ -64,7 +64,9 @@ export function createOverlay(options: {
     options.onSubmit(lyrics.trackKey, lyrics.lines, ""); // authorId handled in index.ts
   };
 
-  const settingsPanel = createSettingsPanel(overlay, options.onClearCache, options.manual);
+  const settingsPanel = createSettingsPanel(overlay, options.onClearCache, options.manual, (ignore) => {
+    ignoreProgrammaticScroll = ignore;
+  });
   const recordHud = createRecordHud(options.manual, handleSubmit, () => settingsPanel.syncSettings());
 
   const vibrantBg = h("div", { id: "lyrify-vibrant-bg" });
@@ -241,6 +243,10 @@ export function createOverlay(options: {
     resetFollow: () => {
         isAutoFollowEnabled = true;
         lastLyricsKey = ""; // Also force a full DOM rebuild for the new song
+        scrollInner.scrollTop = 0;
+    },
+    setIgnoreScroll: (ignore: boolean) => {
+        ignoreProgrammaticScroll = ignore;
     },
     render: (miniOpen: boolean) => {
       isMiniOpen = miniOpen;
@@ -287,6 +293,7 @@ export function createOverlay(options: {
             linesEl.appendChild(div);
           });
           lastLyricsKey = lyricsKey;
+          scrollInner.scrollTop = 0;
       }
 
       // Efficient class updates
