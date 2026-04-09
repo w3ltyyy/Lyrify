@@ -6,6 +6,9 @@
     "better-sqlite3": "^12.8.0",
     "geoip-lite": "^2.0.1"
   },
+  "scripts": {
+    "start": "node server.js"
+  },
   "devDependencies": {
     "@types/d3-scale": "^4.0.9"
   }
