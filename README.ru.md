@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.png" width="128" height="128" />
+  <img src="assets/logo.svg" width="128" height="128" />
 </p>
 
 # 🇷🇺 Lyrify: Профессиональная синхронизация текста для Spotify
