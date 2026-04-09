@@ -1,10 +1,16 @@
 <p align="center">
-  <img src="assets/logo-v2.svg" width="128" height="128" />
+  <img src="assets/logo-v2.svg" width="200" height="200" />
 </p>
 
-# 🎵 Lyrify: Professional Lyrics Sync for Spotify
+<h1 align="center">Lyrify</h1>
+
+<p align="center">
+  <b>Professional Lyrics Sync for Spotify</b>
+</p>
 
 [Русская версия](README.ru.md)
+
+---
 
 **Lyrify** is a high-performance **Spotify** extension (via **Spicetify**) designed for audiophiles who value accuracy and aesthetics. It offers a complete ecosystem for viewing, recording, and moderating synchronized lyrics.
 

@@ -1,10 +1,16 @@
 <p align="center">
-  <img src="assets/logo-v2.svg" width="128" height="128" />
+  <img src="assets/logo-v2.svg" width="200" height="200" />
 </p>
 
-# 🇷🇺 Lyrify: Профессиональная синхронизация текста для Spotify
+<h1 align="center">Lyrify</h1>
+
+<p align="center">
+  <b>Профессиональная синхронизация текста для Spotify</b>
+</p>
 
 [English version](README.md)
+
+---
 
 **Lyrify** — это высокопроизводительное расширение для **Spotify** (через **Spicetify**), созданное для меломанов, которые ценят точность и эстетику. Оно предлагает полную экосистему для просмотра, записи и модерации синхронизированных текстов песен.
 
