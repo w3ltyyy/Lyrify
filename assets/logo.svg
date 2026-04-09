@@ -1,4 +1,5 @@
 <svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="24" fill="white"/>
   <rect x="24" y="28" width="80" height="18" rx="9" fill="url(#paint0_linear)"/>
   <rect x="24" y="56" width="80" height="18" rx="9" fill="url(#paint1_linear)"/>
   <rect x="24" y="84" width="48" height="18" rx="9" fill="#1DB954"/>
