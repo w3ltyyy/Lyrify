@@ -87,13 +87,6 @@ Lyrify allows deep customization through its settings panel:
 
 ---
 
-### 📂 Adding Media (Screenshots & Video)
-To add your own media to this README:
-1. Create a folder named `assets` in the root directory.
-2. Place your photos (`view.png`, `hud.png`) or GIFs/videos there.
-3. Reference them in Markdown: `![Description](assets/filename.png)`.
-
----
 
 ### 📄 License
 This project is licensed under the **MIT License**.
