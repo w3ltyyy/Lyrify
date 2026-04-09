@@ -12,6 +12,7 @@ const ADMIN_TOKEN = process.env.ADMIN_TOKEN ?? "";
 const ADMIN_DIR = path.resolve(process.cwd(), "admin");
 
 // Initialize DB
+fs.mkdirSync(path.dirname(DB_FILE), { recursive: true });
 const db = new Database(DB_FILE);
 db.pragma('journal_mode = WAL'); // High-performance concurrent access
 
