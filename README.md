@@ -33,11 +33,7 @@
 
 ### 📺 Video Demo
 
-<!-- 
-TIP: To add a video without bloating the repo, upload it to a GitHub Issue/Discussion 
-and paste the generated link below. 
--->
-[Video Preview coming soon]
+![Lyrify Demo](assets/demo.mp4)
 
 ---
 
