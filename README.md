@@ -33,7 +33,7 @@
 
 ### 📺 Video Demo
 
-![Lyrify Demo](assets/demo.mp4)
+![Lyrify Demo](https://github.com/user-attachments/assets/c4890b7b-1ff3-43d0-8ac4-1805d3845c11)
 
 ---
 
