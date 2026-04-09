@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" width="128" height="128" />
+</p>
+
 # 🎵 Lyrify: Professional Lyrics Sync for Spotify
 
 [Русская версия](README.ru.md)
@@ -18,6 +22,16 @@
   - **Backend**: Node.js API powered by **SQLite** with Write-Ahead Logging (WAL).
   - **Contribution**: Built-in submission system for community-driven lyrics updates.
 - **Smart Fallbacks**: Automatically fetches from **LRCLIB**, **Spotify API**, or native DOM scraping.
+
+---
+
+### 📺 Video Demo
+
+<!-- 
+TIP: To add a video without bloating the repo, upload it to a GitHub Issue/Discussion 
+and paste the generated link below. 
+-->
+[Video Preview coming soon]
 
 ---
 
