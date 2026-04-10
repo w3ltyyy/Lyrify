@@ -292,9 +292,9 @@ async function startExtension() {
 
             const info = observer.getTrackInfo();
             if (!info.artist || !info.title) {
-                if (retryCount < 5) {
-                    // Spotify might be slow to load track data at startup
-                    setTimeout(() => loadLyrics(autoOpen, retryCount + 1, expectedUri), 1000);
+                if (retryCount < 30) {
+                    // Spotify is slow to populate Player.data on startup — retry every 500ms for up to 15s
+                    setTimeout(() => loadLyrics(autoOpen, retryCount + 1, expectedUri), 500);
                 }
                 return;
             }
@@ -541,6 +541,17 @@ async function startExtension() {
         // Initial load
         mountAll();
         loadLyrics(false);
+
+        // Backup: if the initial load failed (Spotify not ready yet), re-trigger on first play/pause event
+        let startupFallbackFired = false;
+        const startupFallback = () => {
+            if (!startupFallbackFired && state.getLyrics().lines.length === 0) {
+                startupFallbackFired = true;
+                loadLyrics(false);
+            }
+        };
+        w.Spicetify.Player.addEventListener("onplaypause", startupFallback);
+        setTimeout(() => { startupFallbackFired = true; }, 20000); // stop listening after 20s
 
         const debouncedMount = debounceByAnimationFrame(() => mountAll());
         const domObserver = new MutationObserver(() => debouncedMount());
