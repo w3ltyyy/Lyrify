@@ -1,0 +1,14 @@
+{
+  "name": "Lyrify",
+  "description": "Lightning-fast synced lyrics for Spicetify using community-sourced data, LRCLIB, and native Spotify lyrics. Features a beautiful dynamic interface with recording tools.",
+  "main": "spicetify-lyrics-sync/dist/lyrics-sync.js",
+  "preview": "assets/logo.png",
+  "readme": "README.md",
+  "authors": [
+    {
+      "name": "w3ltyyy",
+      "url": "https://github.com/w3ltyyy"
+    }
+  ],
+  "tags": ["lyrics", "karaoke", "synced", "community", "music"]
+}

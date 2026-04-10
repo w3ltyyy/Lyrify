@@ -1,6 +1,7 @@
 # Dependencies
 node_modules/
 dist/
+!spicetify-lyrics-sync/dist/lyrics-sync.js
 .spicetify/
 
 # Databases & Data
