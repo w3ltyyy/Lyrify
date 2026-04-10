@@ -4,13 +4,24 @@ const LRCLIB_GET_URL = "https://lrclib.net/api/get";
 const LYRICS_OVH_URL = "https://api.lyrics.ovh/v1";
 const LYRICA_DEFAULT_URL = "https://test-0k.onrender.com";
 
+// Abort a fetch if it takes longer than `ms` milliseconds
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`Timeout after ${ms}ms`)), ms))
+  ]);
+}
+
 async function fetchPlainLyricsFallback(artist: string, title: string, signal?: AbortSignal): Promise<string> {
   const url = `${LYRICS_OVH_URL}/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`;
-  const res = await fetch(url, { method: "GET", headers: { Accept: "application/json" }, signal });
-  if (!res.ok) return "";
-  const json: any = await res.json();
-  const lyrics = typeof json?.lyrics === "string" ? json.lyrics.trim() : "";
-  return lyrics;
+  try {
+    const res = await withTimeout(fetch(url, { method: "GET", headers: { Accept: "application/json" }, signal }), 3000);
+    if (!res.ok) return "";
+    const json: any = await res.json();
+    return typeof json?.lyrics === "string" ? json.lyrics.trim() : "";
+  } catch {
+    return "";
+  }
 }
 
 function getLyricaBaseUrl() {

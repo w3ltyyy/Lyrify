@@ -14,6 +14,9 @@ export function createOverlay(options: {
 }) {
   const overlay = h("div", { id: "lyrify-overlay", style: { display: "none" } });
   const card = h("div", { id: "lyrify-card" });
+  const loadingBar = h("div", { id: "lyrify-loading-bar" });
+  const loadingBarInner = h("div", { id: "lyrify-loading-bar-inner" });
+  loadingBar.appendChild(loadingBarInner);
   
   const header = h("div", { id: "lyrify-header" });
   const headerTitleEl = h("div", { id: "lyrify-title" });
@@ -75,6 +78,7 @@ export function createOverlay(options: {
     vibrantBg.appendChild(blob);
   }
 
+  card.appendChild(loadingBar);
   card.appendChild(header);
   card.appendChild(settingsPanel.element);
   card.appendChild(body);
@@ -231,6 +235,9 @@ export function createOverlay(options: {
     setHeader: (text: string) => { headerTitleEl.textContent = text; },
     setMeta: (text: string) => { meta.textContent = text; },
     setDebug: (text: string) => { currentDebugText = text; debugInfo.textContent = text; },
+    setLoading: (loading: boolean) => {
+      loadingBar.classList.toggle("s-active", loading);
+    },
     updateRecordHudTrack: (info: string, synced: boolean) => recordHud.updateTrack(info, synced),
     refreshRecordHud: () => recordHud.update(),
     showRecordHud: () => recordHud.showRecord(),
@@ -266,6 +273,11 @@ export function createOverlay(options: {
       const activeIdx = state.getActiveIndex();
       const recordIdx = options.manual.isRecording() ? options.manual.getCurrentIndex() : null;
       const lyricsKey = `${lyrics.trackKey}-${lyrics.lines.length}`;
+
+      // Auto-hide loading bar when lyrics are available
+      if (lyrics.lines.length > 0) {
+        loadingBar.classList.remove("s-active");
+      }
 
       if (lyrics.authorNickname) {
           meta.textContent = `Синхронизировано: @${lyrics.authorNickname}`;

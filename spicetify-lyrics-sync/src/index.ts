@@ -13,7 +13,7 @@ import { tryFetchNativeSpotifyUiLyrics } from "./components/NativeScraper";
 import { readUiSettings } from "./components/SettingsPanel";
 import { createManualSyncController } from "./manualSync";
 
-const BACKEND_BASE_URL = "http://localhost:8080";
+const BACKEND_BASE_URL = "https://lyrify-api.aquashield.lol";
 
 async function backendGetSync(trackKey: string, signal?: AbortSignal): Promise<any> {
     const url = new URL(`${BACKEND_BASE_URL}/sync`);
@@ -346,7 +346,7 @@ async function startExtension() {
             };
 
             try {
-                // 1. Try Cache
+                // 1. Cache — zero latency, show immediately
                 const cached = LyricsCache.get(trackKey) || LyricsCache.get(relaxedKey);
                 if (cached && cached.lines.length > 0) {
                     if (signal.aborted) return;
@@ -358,113 +358,89 @@ async function startExtension() {
                     return;
                 }
 
-                // 2. Try Backend
-                try {
-                    const backendRecord = await backendGetSync(trackKey, signal) || await backendGetSync(relaxedKey, signal);
-                    if (backendRecord) {
-                        if (signal.aborted) return;
-                        const model: LyricsModel = {
-                            trackKey: backendRecord.trackKey || trackKey,
-                            lines: backendRecord.lines,
-                            synced: true,
-                            authorNickname: backendRecord.authorNickname
-                        };
-                        state.setLyrics(model);
-                        LyricsCache.set(trackKey, model);
-                        addDebug(`Source: Backend\nSynced: true\nAuthor: ${backendRecord.authorNickname || "Anonymous"}`);
-                        ensureHighlightTimer();
-                        overlay.render(miniOpen);
-                        sendPlayPing(trackKey, info.artist, info.title, true, info.uri);
-                        return;
-                    }
-                } catch (e) {
-                    addDebug(`Backend fetch error: ${e}`);
-                }
+                // 2. Progressive parallel fetch — show first good result, upgrade if better arrives
+                // Priority score: synced Backend=100, synced LRCLIB/Spotify=50, unsynced=10
+                let bestScore = -1;
+                overlay.setLoading(true);
 
-                // 3. Try LRCLIB
-                let lrclibModel: LyricsModel | null = null;
-                try {
-                    lrclibModel = await fetchLyricsFromLrclib({
-                        artist: info.artist,
-                        title: info.title,
-                        durationSeconds: info.durationSeconds,
-                        trackKey,
-                        signal,
-                        onDebug: (info) => {
-                            addDebug(`LRCLIB:\nplainLen=${info.plainLen}\nhasSynced=${info.hasSynced}\nsyncedType=${info.syncedLyricsType}\nfallback=${info.fallbackProvider ?? "-"}\nfallbackPlainLen=${info.fallbackPlainLen ?? 0}\nfallbackHasSynced=${info.fallbackHasSynced ?? false}`);
-                        }
-                    });
-                } catch (e) {
-                    addDebug(`LRCLIB fetch error: ${e}`);
-                }
-
-                // If LRCLIB found SYNCHRONIZED lyrics, we are happy.
-                if (lrclibModel && lrclibModel.synced && lrclibModel.lines.length > 0) {
+                const tryApply = (model: LyricsModel, score: number, sourceName: string) => {
                     if (signal.aborted) return;
-                    state.setLyrics(lrclibModel);
-                    LyricsCache.set(trackKey, lrclibModel);
-                    addDebug(`Source: LRCLIB (Synced)\nLines: ${lrclibModel.lines.length}`);
-                    ensureHighlightTimer();
+                    if (score <= bestScore) return; // only upgrade, never downgrade
+                    bestScore = score;
+                    state.setLyrics(model);
+                    LyricsCache.set(trackKey, model);
+                    addDebug(`Source: ${sourceName}\nSynced: ${model.synced}\nLines: ${model.lines.length}`);
+                    if (model.synced) ensureHighlightTimer();
                     overlay.render(miniOpen);
-                    sendPlayPing(trackKey, info.artist, info.title, true, info.uri);
-                    return;
-                }
+                };
 
-                // 4. Try Spotify Cosmos API (either as fallback or to get BETTER sync than LRCLIB plain text)
-                addDebug(lrclibModel ? "LRCLIB has only plain text, checking Spotify API for sync..." : "LRCLIB empty/failed, trying Spotify API...");
-                let spotifyApiModel: LyricsModel | null = null;
-                try {
-                    const rawSpotify = await fetchSpotifyApiLyrics(info.uri, addDebug);
-                    if (rawSpotify) {
-                        spotifyApiModel = { ...rawSpotify, trackKey };
-                    }
-                    if (spotifyApiModel && spotifyApiModel.lines.length > 0) {
-                        // IF Spotify has SYNCED, prioritized it over LRCLIB plain!
-                        if (spotifyApiModel.synced) {
-                            if (signal.aborted) return;
-                            const finalSpotifyModel: LyricsModel = {
-                                trackKey,
-                                lines: spotifyApiModel.lines,
-                                synced: true
-                            };
-                            state.setLyrics(finalSpotifyModel);
-                            addDebug(`Source: Spotify API (Synced)\nLines: ${spotifyApiModel.lines.length}`);
-                            ensureHighlightTimer();
-                            overlay.render(miniOpen);
-                            sendPlayPing(trackKey, info.artist, info.title, true, info.uri);
-                            return;
-                        }
-                    }
-                } catch (e) {
-                    addDebug(`Spotify API fetch error: ${e}`);
-                }
-
-                // 5. Finalize from best available Unsynced source
                 const s = readUiSettings();
-                const bestUnsynced = lrclibModel || spotifyApiModel;
 
-                if (bestUnsynced && bestUnsynced.lines.length > 0) {
-                    if (signal.aborted) return;
-                    const s = readUiSettings();
-                    const shouldAutogen = s.autoGenerate && info.durationMs;
-                    const finalLines = shouldAutogen ? autoGenerateTimings(bestUnsynced.lines, info.durationMs!) : bestUnsynced.lines;
-                    const finalModel: LyricsModel = {
-                        ...bestUnsynced,
-                        trackKey, 
-                        lines: finalLines,
-                        synced: !!shouldAutogen
-                    };
+                // Backend (priority 100 — verified community data)
+                const backendPromise = (async () => {
+                    try {
+                        const rec = await backendGetSync(trackKey, signal) || await backendGetSync(relaxedKey, signal);
+                        if (rec && !signal.aborted) {
+                            tryApply({
+                                trackKey: rec.trackKey || trackKey,
+                                lines: rec.lines,
+                                synced: true,
+                                authorNickname: rec.authorNickname
+                            }, 100, `Backend (Author: ${rec.authorNickname || "Anonymous"})`);
+                        }
+                    } catch (e) { addDebug(`Backend error: ${e}`); }
+                })();
 
-                    state.setLyrics(finalModel);
-                    LyricsCache.set(trackKey, finalModel);
-                    addDebug(`Source: Fallback Plain Text\nAutoGen: ${!!shouldAutogen}\nLines: ${finalModel.lines.length}`);
-                    if (finalModel.synced) ensureHighlightTimer();
-                    overlay.render(miniOpen);
-                    sendPlayPing(trackKey, info.artist, info.title, finalModel.synced, info.uri);
+                // LRCLIB (priority 50 synced, 10 plain)
+                const lrclibPromise = (async () => {
+                    try {
+                        const m = await fetchLyricsFromLrclib({
+                            artist: info.artist, title: info.title,
+                            durationSeconds: info.durationSeconds, trackKey, signal,
+                            onDebug: (dbg) => addDebug(`LRCLIB: plain=${dbg.plainLen} synced=${dbg.hasSynced} fallback=${dbg.fallbackProvider ?? "-"}`)
+                        });
+                        if (m && m.lines.length > 0 && !signal.aborted) {
+                            if (m.synced) {
+                                tryApply(m, 50, "LRCLIB (Synced)");
+                            } else {
+                                const shouldAutogen = s.autoGenerate && info.durationMs;
+                                const finalLines = shouldAutogen ? autoGenerateTimings(m.lines, info.durationMs!) : m.lines;
+                                tryApply({ ...m, trackKey, lines: finalLines, synced: !!shouldAutogen }, 10, `LRCLIB (Plain${shouldAutogen ? " + AutoGen" : ""})`);
+                            }
+                        }
+                    } catch (e) { addDebug(`LRCLIB error: ${e}`); }
+                })();
+
+                // Spotify API (priority 50 synced, 10 plain)
+                const spotifyPromise = (async () => {
+                    try {
+                        const raw = await fetchSpotifyApiLyrics(info.uri, addDebug);
+                        if (raw && raw.lines.length > 0 && !signal.aborted) {
+                            const m: LyricsModel = { ...raw, trackKey };
+                            if (m.synced) {
+                                tryApply(m, 50, "Spotify API (Synced)");
+                            } else {
+                                const shouldAutogen = s.autoGenerate && info.durationMs;
+                                const finalLines = shouldAutogen ? autoGenerateTimings(m.lines, info.durationMs!) : m.lines;
+                                tryApply({ ...m, lines: finalLines, synced: !!shouldAutogen }, 10, `Spotify API (Plain${shouldAutogen ? " + AutoGen" : ""})`);
+                            }
+                        }
+                    } catch (e) { addDebug(`Spotify error: ${e}`); }
+                })();
+
+                // Wait for all to finish
+                await Promise.allSettled([backendPromise, lrclibPromise, spotifyPromise]);
+
+                if (signal.aborted) return;
+
+                // Send play ping with whatever we ended up with
+                const finalLyrics = state.getLyrics();
+                if (finalLyrics.trackKey === trackKey && finalLyrics.lines.length > 0 && bestScore >= 0) {
+                    sendPlayPing(trackKey, info.artist, info.title, finalLyrics.synced, info.uri);
                     return;
                 }
 
-                // 5. Ultimate Fallback: DOM Scraper
+                // 3. Ultimate fallback: native DOM scraper
                 addDebug("No API lyrics, trying native DOM scraper...");
                 try {
                     isScrubbingNative = true;
@@ -489,17 +465,14 @@ async function startExtension() {
                 }
 
                 if (signal.aborted) return;
-                addDebug(`Source: None\nStatus: Error 404`);
-                const finalErrModel: LyricsModel = {
+                addDebug(`Source: None\nStatus: 404`);
+                overlay.setLoading(false);
+                state.setLyrics({
                     trackKey,
-                    lines: [
-                        { text: "Кажется, мы не нашли текст к этой песне :(", startTime: null },
-                    ],
+                    lines: [{ text: "Кажется, мы не нашли текст к этой песне :(", startTime: null }],
                     synced: false
-                };
-                state.setLyrics(finalErrModel);
+                });
                 overlay.render(miniOpen);
-
                 sendMissingPing(trackKey, info.artist, info.title);
                 sendPlayPing(trackKey, info.artist, info.title, false, info.uri);
 

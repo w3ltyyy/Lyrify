@@ -89,6 +89,31 @@ export const STYLES = `
       box-shadow: 0 26px 90px rgba(0,0,0,0.75);
       filter: brightness(var(--lyrify-brightness, 1));
     }
+    #lyrify-loading-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      z-index: 100;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    #lyrify-loading-bar.s-active {
+      opacity: 1;
+    }
+    #lyrify-loading-bar-inner {
+      position: absolute;
+      top: 0; left: -60%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent 0%, var(--lyrify-accent-strong, #1db954) 50%, transparent 100%);
+      animation: lyrify-loading-slide 1.4s ease-in-out infinite;
+    }
+    @keyframes lyrify-loading-slide {
+      0%   { left: -60%; }
+      100% { left: 120%; }
+    }
     #lyrify-overlay.s-fullscreen #lyrify-card {
       width: 100%;
       height: 100%;
