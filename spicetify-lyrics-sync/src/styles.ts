@@ -21,6 +21,11 @@ export const STYLES = `
       transition: background 0.6s ease;
       background: var(--lyrify-bg, #121212);
     }
+    #lyrify-overlay.s-split-view {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 99999;
+    }
     #lyrify-vibrant-bg {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -76,18 +81,219 @@ export const STYLES = `
       100% { transform: translate(-25%, -20%) scale(1); }
     }
     #lyrify-card {
-      width: min(860px, 88vw);
-      max-height: 82vh;
-      min-height: 480px;
-      align-self: stretch;
+      width: 100%;
+      height: 100%;
+      max-height: none;
       display: flex;
       flex-direction: column;
       background: var(--lyrify-card-bg, #121212);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 18px;
+      border-radius: 0;
+      border: none;
       overflow: hidden;
-      box-shadow: 0 26px 90px rgba(0,0,0,0.75);
+      box-shadow: none;
       filter: brightness(var(--lyrify-brightness, 1));
+      transition: flex-direction 0.4s;
+    }
+    #lyrify-overlay.s-split-view #lyrify-card {
+      flex-direction: row;
+    }
+    #lyrify-left-panel {
+      display: none;
+      flex: 0 0 45%;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      box-sizing: border-box;
+      background: transparent;
+      border: none;
+    }
+    #lyrify-overlay.s-split-view #lyrify-left-panel {
+      display: flex;
+      animation: lyrify-left-in 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .lyrify-right-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+      position: relative;
+    }
+    @keyframes lyrify-left-in {
+      from { opacity: 0; transform: translateX(-40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    #lyrify-fs-cover-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 380px;
+      aspect-ratio: 1;
+      margin-bottom: 24px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+    #lyrify-fs-cover {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    #lyrify-fs-cover-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #lyrify-fs-cover-wrap:hover #lyrify-fs-cover-overlay {
+      opacity: 1;
+    }
+    #lyrify-fs-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      text-align: center;
+      margin-top: 16px;
+      margin-bottom: 2px;
+      width: 100%;
+      word-break: break-word;
+    }
+    #lyrify-fs-artist {
+      font-size: 16px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.7);
+      text-align: center;
+      width: 100%;
+      margin-bottom: 24px;
+    }
+    #lyrify-fs-seek {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #lyrify-fs-seek .lyrify-fs-time {
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.6);
+      font-variant-numeric: tabular-nums;
+      width: 36px;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    #lyrify-fs-seek:hover .lyrify-fs-time {
+      opacity: 1;
+    }
+    #lyrify-fs-seek input[type="range"] {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      appearance: none;
+      background: linear-gradient(to right, rgba(255, 255, 255, 0.9) var(--progress, 0%), rgba(255, 255, 255, 0.2) var(--progress, 0%));
+      cursor: pointer;
+    }
+    #lyrify-fs-seek input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 0;
+      height: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .lyrify-fs-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      outline: none;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.7);
+      transition: all 0.2s;
+    }
+    .lyrify-fs-btn:hover {
+      color: #fff;
+      transform: scale(1.1);
+    }
+    .lyrify-fs-btn svg {
+      width: 28px;
+      height: 28px;
+      fill: currentColor;
+    }
+    .lyrify-fs-btn.s-play {
+      color: #fff;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .lyrify-fs-btn.s-play:hover {
+      transform: scale(1.1);
+    }
+    .lyrify-fs-btn.s-play svg {
+      width: 48px;
+      height: 48px;
+    }
+    .lyrify-fs-exit-btn {
+      position: absolute;
+      top: 32px;
+      right: 32px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 100000;
+      opacity: 0;
+      transition: all 0.2s ease;
+    }
+    #lyrify-overlay.s-split-view.s-mouse-active .lyrify-fs-exit-btn,
+    .lyrify-fs-exit-btn:hover {
+      opacity: 1 !important;
+      pointer-events: auto;
+    }
+    .lyrify-fs-exit-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+    .lyrify-fs-exit-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+    
+    #lyrify-overlay.s-split-view #lyrify-header {
+      display: none !important;
+    }
+    #lyrify-overlay.s-split-view #lyrify-scroll-inner {
+      mask-image: linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%);
+    }
+    #lyrify-overlay.s-split-view #lyrify-scroll-inner.s-no-mask-top {
+      mask-image: linear-gradient(to bottom, black 0%, black 65%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black 0%, black 65%, transparent 100%);
+    }
+    #lyrify-overlay.s-split-view #lyrify-scroll-inner.s-no-mask-bottom {
+      mask-image: linear-gradient(to bottom, transparent 0%, black 35%, black 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 35%, black 100%);
+    }
+    #lyrify-overlay.s-split-view #lyrify-scroll-inner.s-no-mask-top.s-no-mask-bottom {
+      mask-image: none !important;
+      -webkit-mask-image: none !important;
     }
     #lyrify-loading-bar {
       position: absolute;
@@ -113,14 +319,6 @@ export const STYLES = `
     @keyframes lyrify-loading-slide {
       0%   { left: -60%; }
       100% { left: 120%; }
-    }
-    #lyrify-overlay.s-fullscreen #lyrify-card {
-      width: 100%;
-      height: 100%;
-      max-height: none;
-      border-radius: 0;
-      border: none;
-      box-shadow: none;
     }
     #lyrify-mini {
       position: fixed;
@@ -421,7 +619,7 @@ export const STYLES = `
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    #lyrify-settings-toggle {
+    #lyrify-settings-toggle, #lyrify-splitview-toggle {
       cursor: pointer;
       border-radius: 10px;
       border: 1px solid rgba(255,255,255,0.14);
@@ -728,16 +926,16 @@ export const STYLES = `
       white-space: pre-wrap;
     }
     #lyrify-jump-now {
-      position: sticky;
-      bottom: 10px;
-      margin-left: auto;
-      margin-top: 12px;
-      z-index: 5;
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      z-index: 50;
       border-radius: 999px;
       background: var(--lyrify-accent-soft, rgba(30, 215, 96, 0.16));
       border: 1px solid var(--lyrify-accent-border, rgba(30, 215, 96, 0.55));
       color: var(--lyrify-accent-text, #d8ffe7);
-      backdrop-filter: blur(3px);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
     #lyrify-inline-trigger {
       width: 24px;

@@ -30,6 +30,7 @@
 - **High-Performance Recording HUD**: A specialized interface for manual synchronization. Record timecodes using your keyboard in real-time.
 - **Modern Aesthetics**:
   - Integrated **Glassmorphism** and dynamic background effects.
+  - **Immersive Fullscreen Mode**: A clean, distraction-free split-screen layout displaying album art context, intelligent hover controls, and an immersive playback scrubber.
   - Fully responsive typography (font size, line spacing, max width).
   - Dynamic accent colors derived from track artwork.
 - **Robust Architecture**:

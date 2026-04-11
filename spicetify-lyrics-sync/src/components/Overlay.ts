@@ -4,6 +4,13 @@ import { extractDominantColorFromImage, debounceByAnimationFrame } from "../util
 import { createSettingsPanel } from "./SettingsPanel";
 import { createRecordHud } from "./RecordHud";
 import { ManualSyncController } from "../manualSync";
+import { formatMs } from "../utils";
+
+const SVG_PREV = `<svg viewBox="0 0 16 16"><path d="M12.7 1a.7.7 0 0 0-.7.7v5.15L3.483 1.141a.7.7 0 0 0-1.083.593v12.532a.7.7 0 0 0 1.083.593L12 9.15V14.3a.7.7 0 0 0 .7.7h1.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-1.6z"/></svg>`;
+const SVG_NEXT = `<svg viewBox="0 0 16 16"><path d="M3.3 1a.7.7 0 0 1 .7.7v5.15l8.517-5.709a.7.7 0 0 1 1.083.593v12.532a.7.7 0 0 1-1.083.593L4 9.15V14.3a.7.7 0 0 1-.7.7H1.6a.7.7 0 0 1-.7-.7V1.7a.7.7 0 0 1 .7-.7H3.3z"/></svg>`;
+const SVG_PLAY = `<svg viewBox="0 0 16 16"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894a.7.7 0 0 1-1.05-.607V1.713z"/></svg>`;
+const SVG_PAUSE = `<svg viewBox="0 0 16 16"><path d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm7.4 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z"/></svg>`;
+
 
 export function createOverlay(options: {
   manual: ManualSyncController;
@@ -22,9 +29,11 @@ export function createOverlay(options: {
   const headerTitleEl = h("div", { id: "lyrify-title" });
   
   const headerRight = h("div", { id: "lyrify-header-right" });
+  const splitViewBtn = h("button", { id: "lyrify-splitview-toggle", title: "Immersive Split-screen" }, "⛶");
   const miniBtn = h("button", { id: "lyrify-mini-toggle" }, "Mini");
   const settingsBtn = h("button", { id: "lyrify-settings-toggle", title: "Display settings" }, "⚙");
   
+  headerRight.appendChild(splitViewBtn);
   headerRight.appendChild(miniBtn);
   headerRight.appendChild(settingsBtn);
   header.appendChild(headerTitleEl);
@@ -51,8 +60,8 @@ export function createOverlay(options: {
   });
 
   scrollInner.appendChild(linesEl);
-  scrollInner.appendChild(jumpNowBtn);
   scrollWrap.appendChild(scrollInner);
+  scrollWrap.appendChild(jumpNowBtn);
   body.appendChild(meta);
   body.appendChild(scrollWrap);
   body.appendChild(debugInfo);
@@ -78,11 +87,79 @@ export function createOverlay(options: {
     vibrantBg.appendChild(blob);
   }
 
-  card.appendChild(loadingBar);
-  card.appendChild(header);
-  card.appendChild(settingsPanel.element);
-  card.appendChild(body);
+  // --- SPLIT SCREEN UI ---
+  const leftPanel = h("div", { id: "lyrify-left-panel" });
+  
+  const coverWrap = h("div", { id: "lyrify-fs-cover-wrap" });
+  const coverArt = h("img", { id: "lyrify-fs-cover", src: "" }) as HTMLImageElement;
+  const coverOverlay = h("div", { id: "lyrify-fs-cover-overlay" });
+  
+  const trackTitle = h("div", { id: "lyrify-fs-title" }, "-");
+  const trackArtist = h("div", { id: "lyrify-fs-artist" }, "-");
+  
+  const seekSection = h("div", { id: "lyrify-fs-seek" });
+  const seekCurrent = h("div", { className: "lyrify-fs-time" }, "0:00");
+  const seekRange = h("input", { type: "range", min: "0", max: "1000", step: "1", value: "0" }) as HTMLInputElement;
+  const seekTotal = h("div", { className: "lyrify-fs-time" }, "0:00");
+  seekSection.appendChild(seekCurrent);
+  seekSection.appendChild(seekRange);
+  seekSection.appendChild(seekTotal);
+
+  const btnPrev = h("button", { className: "lyrify-fs-btn", title: "Previous" });
+  const btnPlay = h("button", { className: "lyrify-fs-btn s-play", title: "Play / Pause" });
+  const btnNext = h("button", { className: "lyrify-fs-btn", title: "Next" });
+  btnPrev.innerHTML = SVG_PREV;
+  btnPlay.innerHTML = SVG_PLAY;
+  btnNext.innerHTML = SVG_NEXT;
+  
+  coverOverlay.appendChild(btnPrev);
+  coverOverlay.appendChild(btnPlay);
+  coverOverlay.appendChild(btnNext);
+  
+  coverWrap.appendChild(coverArt);
+  coverWrap.appendChild(coverOverlay);
+
+  leftPanel.appendChild(coverWrap);
+  leftPanel.appendChild(seekSection);
+  leftPanel.appendChild(trackTitle);
+  leftPanel.appendChild(trackArtist);
+
+  // Bind full-screen player actions
+  btnPrev.onclick = () => { (window as any).Spicetify.Player.back(); isAutoFollowEnabled = true; };
+  btnPlay.onclick = () => { (window as any).Spicetify.Player.togglePlay(); };
+  btnNext.onclick = () => { (window as any).Spicetify.Player.next(); isAutoFollowEnabled = true; };
+
+  let isSeekDragging = false;
+  seekRange.onpointerdown = () => { isSeekDragging = true; };
+  seekRange.onpointerup = () => { isSeekDragging = false; };
+
+  seekRange.oninput = () => {
+      const dur = (window as any).Spicetify.Player.getDuration();
+      const val = Number(seekRange.value);
+      seekCurrent.textContent = formatMs(Math.floor((val / 1000) * dur));
+      seekRange.style.setProperty("--progress", `${val / 10}%`);
+  };
+  seekRange.onchange = () => {
+      const dur = (window as any).Spicetify.Player.getDuration();
+      const val = Number(seekRange.value);
+      (window as any).Spicetify.Player.seek(Math.floor((val / 1000) * dur));
+  };
+  // -------------------------
+
+  const rightWrap = h("div", { className: "lyrify-right-wrap" });
+  rightWrap.appendChild(loadingBar);
+  rightWrap.appendChild(header);
+  rightWrap.appendChild(settingsPanel.element);
+  rightWrap.appendChild(body);
+
+  card.appendChild(leftPanel);
+  card.appendChild(rightWrap);
+  
+  const exitFsBtn = h("div", { className: "lyrify-fs-exit-btn", title: "Exit Full Screen" });
+  exitFsBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M16 10l-4 4-4-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
   overlay.appendChild(vibrantBg); // Blobs are behind the card
+  overlay.appendChild(exitFsBtn);
   overlay.appendChild(card);
   overlay.appendChild(recordHud.element);
 
@@ -102,6 +179,8 @@ export function createOverlay(options: {
     }
 
     const result = await extractDominantColorFromImage(imageUrl);
+    coverArt.src = imageUrl;
+
     if (!result) return;
     const { dominant, palette } = result;
     const { r, g, b } = dominant;
@@ -219,6 +298,63 @@ export function createOverlay(options: {
   settingsBtn.onclick = () => settingsPanel.toggle();
   miniBtn.onclick = () => options.toggleMini();
 
+  let isSplitView = false;
+  
+  const toggleSplitView = () => {
+      isSplitView = !isSplitView;
+      overlay.classList.toggle("s-split-view", isSplitView);
+  };
+  
+  let mouseTimer: any = null;
+  overlay.addEventListener("mousemove", () => {
+      if (!isSplitView) return;
+      overlay.classList.add("s-mouse-active");
+      clearTimeout(mouseTimer);
+      mouseTimer = setTimeout(() => {
+          overlay.classList.remove("s-mouse-active");
+      }, 2500);
+  });
+  
+  splitViewBtn.onclick = toggleSplitView;
+  exitFsBtn.onclick = toggleSplitView;
+
+  // High-framerate metadata syncing independent of lyrics
+  let lastPlayState: boolean | null = null;
+  const syncLoop = () => {
+      if (isSplitView) {
+          const spc = (window as any).Spicetify.Player;
+          const progressMs = spc.getProgress();
+          const durationMs = spc.getDuration();
+          const isPlaying = spc.isPlaying();
+          const trackInfo = spc.data?.track?.metadata || {};
+          const itemInfo = spc.data?.item || {};
+          
+          if (lastPlayState !== isPlaying) {
+              btnPlay.innerHTML = isPlaying ? SVG_PAUSE : SVG_PLAY;
+              lastPlayState = isPlaying;
+          }
+          
+          if (!isSeekDragging) {
+             const curStr = formatMs(progressMs);
+             const totStr = formatMs(durationMs);
+             if (seekCurrent.textContent !== curStr) seekCurrent.textContent = curStr;
+             if (seekTotal.textContent !== totStr) seekTotal.textContent = totStr;
+             const rawVal = durationMs > 0 ? (progressMs / durationMs) * 1000 : 0;
+             const valStr = String(rawVal);
+             if (seekRange.value !== valStr) seekRange.value = valStr;
+             seekRange.style.setProperty("--progress", `${rawVal / 10}%`);
+          }
+
+          const fallbackArtist = safeText(itemInfo?.artists?.map((a: any) => safeText(a?.name)).join(", "));
+          const newTitle = trackInfo.title || itemInfo?.name || "-";
+          const newArtist = trackInfo.artist_name || fallbackArtist || "-";
+          if (trackTitle.textContent !== newTitle) trackTitle.textContent = newTitle;
+          if (trackArtist.textContent !== newArtist) trackArtist.textContent = newArtist;
+      }
+      setTimeout(syncLoop, 100);
+  };
+  syncLoop();
+
   jumpNowBtn.onclick = () => {
     isAutoFollowEnabled = true;
     const active = linesEl.querySelector(".s-active");
@@ -232,6 +368,10 @@ export function createOverlay(options: {
 
   return {
     element: overlay,
+    resetSplitView: () => {
+        isSplitView = false;
+        overlay.classList.remove("s-split-view");
+    },
     setHeader: (text: string) => { headerTitleEl.textContent = text; },
     setMeta: (text: string) => { meta.textContent = text; },
     setDebug: (text: string) => { currentDebugText = text; debugInfo.textContent = text; },
@@ -336,4 +476,8 @@ export function createOverlay(options: {
       }
     }
   };
+}
+
+function safeText(s: any) {
+    return typeof s === "string" ? s.trim() : "";
 }

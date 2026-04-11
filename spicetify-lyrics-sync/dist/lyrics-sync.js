@@ -128,6 +128,11 @@
       transition: background 0.6s ease;
       background: var(--lyrify-bg, #121212);
     }
+    #lyrify-overlay.s-split-view {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 99999;
+    }
     #lyrify-vibrant-bg {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -183,18 +188,219 @@
       100% { transform: translate(-25%, -20%) scale(1); }
     }
     #lyrify-card {
-      width: min(860px, 88vw);
-      max-height: 82vh;
-      min-height: 480px;
-      align-self: stretch;
+      width: 100%;
+      height: 100%;
+      max-height: none;
       display: flex;
       flex-direction: column;
       background: var(--lyrify-card-bg, #121212);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 18px;
+      border-radius: 0;
+      border: none;
       overflow: hidden;
-      box-shadow: 0 26px 90px rgba(0,0,0,0.75);
+      box-shadow: none;
       filter: brightness(var(--lyrify-brightness, 1));
+      transition: flex-direction 0.4s;
+    }
+    #lyrify-overlay.s-split-view #lyrify-card {
+      flex-direction: row;
+    }
+    #lyrify-left-panel {
+      display: none;
+      flex: 0 0 45%;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      box-sizing: border-box;
+      background: transparent;
+      border: none;
+    }
+    #lyrify-overlay.s-split-view #lyrify-left-panel {
+      display: flex;
+      animation: lyrify-left-in 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .lyrify-right-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+      position: relative;
+    }
+    @keyframes lyrify-left-in {
+      from { opacity: 0; transform: translateX(-40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    #lyrify-fs-cover-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 380px;
+      aspect-ratio: 1;
+      margin-bottom: 24px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+    #lyrify-fs-cover {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    #lyrify-fs-cover-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #lyrify-fs-cover-wrap:hover #lyrify-fs-cover-overlay {
+      opacity: 1;
+    }
+    #lyrify-fs-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      text-align: center;
+      margin-top: 16px;
+      margin-bottom: 2px;
+      width: 100%;
+      word-break: break-word;
+    }
+    #lyrify-fs-artist {
+      font-size: 16px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.7);
+      text-align: center;
+      width: 100%;
+      margin-bottom: 24px;
+    }
+    #lyrify-fs-seek {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #lyrify-fs-seek .lyrify-fs-time {
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.6);
+      font-variant-numeric: tabular-nums;
+      width: 36px;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    #lyrify-fs-seek:hover .lyrify-fs-time {
+      opacity: 1;
+    }
+    #lyrify-fs-seek input[type="range"] {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      appearance: none;
+      background: linear-gradient(to right, rgba(255, 255, 255, 0.9) var(--progress, 0%), rgba(255, 255, 255, 0.2) var(--progress, 0%));
+      cursor: pointer;
+    }
+    #lyrify-fs-seek input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 0;
+      height: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .lyrify-fs-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      outline: none;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.7);
+      transition: all 0.2s;
+    }
+    .lyrify-fs-btn:hover {
+      color: #fff;
+      transform: scale(1.1);
+    }
+    .lyrify-fs-btn svg {
+      width: 28px;
+      height: 28px;
+      fill: currentColor;
+    }
+    .lyrify-fs-btn.s-play {
+      color: #fff;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .lyrify-fs-btn.s-play:hover {
+      transform: scale(1.1);
+    }
+    .lyrify-fs-btn.s-play svg {
+      width: 48px;
+      height: 48px;
+    }
+    .lyrify-fs-exit-btn {
+      position: absolute;
+      top: 32px;
+      right: 32px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 100000;
+      opacity: 0;
+      transition: all 0.2s ease;
+    }
+    #lyrify-overlay.s-split-view.s-mouse-active .lyrify-fs-exit-btn,
+    .lyrify-fs-exit-btn:hover {
+      opacity: 1 !important;
+      pointer-events: auto;
+    }
+    .lyrify-fs-exit-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+    .lyrify-fs-exit-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+    
+    #lyrify-overlay.s-split-view #lyrify-header {
+      display: none !important;
+    }
+    #lyrify-overlay.s-split-view #lyrify-scroll-inner {
+      mask-image: linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%);
+    }
+    #lyrify-overlay.s-split-view #lyrify-scroll-inner.s-no-mask-top {
+      mask-image: linear-gradient(to bottom, black 0%, black 65%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black 0%, black 65%, transparent 100%);
+    }
+    #lyrify-overlay.s-split-view #lyrify-scroll-inner.s-no-mask-bottom {
+      mask-image: linear-gradient(to bottom, transparent 0%, black 35%, black 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 35%, black 100%);
+    }
+    #lyrify-overlay.s-split-view #lyrify-scroll-inner.s-no-mask-top.s-no-mask-bottom {
+      mask-image: none !important;
+      -webkit-mask-image: none !important;
     }
     #lyrify-loading-bar {
       position: absolute;
@@ -220,14 +426,6 @@
     @keyframes lyrify-loading-slide {
       0%   { left: -60%; }
       100% { left: 120%; }
-    }
-    #lyrify-overlay.s-fullscreen #lyrify-card {
-      width: 100%;
-      height: 100%;
-      max-height: none;
-      border-radius: 0;
-      border: none;
-      box-shadow: none;
     }
     #lyrify-mini {
       position: fixed;
@@ -528,7 +726,7 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    #lyrify-settings-toggle {
+    #lyrify-settings-toggle, #lyrify-splitview-toggle {
       cursor: pointer;
       border-radius: 10px;
       border: 1px solid rgba(255,255,255,0.14);
@@ -835,16 +1033,16 @@
       white-space: pre-wrap;
     }
     #lyrify-jump-now {
-      position: sticky;
-      bottom: 10px;
-      margin-left: auto;
-      margin-top: 12px;
-      z-index: 5;
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      z-index: 50;
       border-radius: 999px;
       background: var(--lyrify-accent-soft, rgba(30, 215, 96, 0.16));
       border: 1px solid var(--lyrify-accent-border, rgba(30, 215, 96, 0.55));
       color: var(--lyrify-accent-text, #d8ffe7);
-      backdrop-filter: blur(3px);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
     #lyrify-inline-trigger {
       width: 24px;
@@ -1191,7 +1389,6 @@
   var LS_UI_BRIGHT = "lyrify_ui_brightness";
   var LS_UI_AUTO = "lyrify_ui_auto_scroll";
   var LS_UI_DEBUG = "lyrify_ui_show_debug";
-  var LS_UI_FULLSCREEN = "lyrify_ui_fullscreen";
   var LS_UI_AUTOGEN = "lyrify_ui_autogen_sync";
   var LS_UI_LINE_GAP = "lyrify_ui_line_gap";
   var LS_UI_MAX_W = "lyrify_ui_max_width";
@@ -1207,7 +1404,6 @@
       brightness: Math.min(1.35, Math.max(0.75, Number(localStorage.getItem(LS_UI_BRIGHT) || "1") || 1)),
       autoScroll: localStorage.getItem(LS_UI_AUTO) !== "0",
       showDebug: localStorage.getItem(LS_UI_DEBUG) === "1",
-      fullscreen: localStorage.getItem(LS_UI_FULLSCREEN) !== "0",
       autoGenerate: localStorage.getItem(LS_UI_AUTOGEN) !== "0",
       lineGapPx: Math.min(28, Math.max(8, Number(localStorage.getItem(LS_UI_LINE_GAP) || "14") || 14)),
       maxWidthPx: Math.min(960, Math.max(480, Number(localStorage.getItem(LS_UI_MAX_W) || "720") || 720)),
@@ -1252,7 +1448,6 @@
     const brightVal = h("span", { className: "lyrify-setting-val" });
     const autoScrollCb = h("input", { type: "checkbox" });
     const showDebugCb = h("input", { type: "checkbox" });
-    const fullscreenCb = h("input", { type: "checkbox" });
     const autogenCb = h("input", { type: "checkbox" });
     const edgeFadeCb = h("input", { type: "checkbox" });
     const vibrantCb = h("input", { type: "checkbox" });
@@ -1270,7 +1465,6 @@
     generalSection.appendChild(row("Brightness", brightRange, brightVal));
     generalSection.appendChild(row("Auto-scroll", autoScrollCb, h("span")));
     generalSection.appendChild(row("Show debug", showDebugCb, h("span")));
-    generalSection.appendChild(row("Fullscreen", fullscreenCb, h("span")));
     generalSection.appendChild(row("Contributor Nickname", nicknameInput, h("span")));
     appearanceSection.appendChild(h("div", { className: "lyrify-settings-subtitle" }, "Lyrics column"));
     appearanceSection.appendChild(row("Line spacing", lineGapRange, lineGapVal));
@@ -1308,7 +1502,6 @@
       brightVal.textContent = `${Math.round(s.brightness * 100)}%`;
       autoScrollCb.checked = s.autoScroll;
       showDebugCb.checked = s.showDebug;
-      fullscreenCb.checked = s.fullscreen;
       autogenCb.checked = s.autoGenerate;
       edgeFadeCb.checked = s.edgeFade;
       vibrantCb.checked = s.vibrant;
@@ -1329,7 +1522,6 @@
         target.style.setProperty("--lyrify-lines-gap", `${s.lineGapPx}px`);
         target.style.setProperty("--lyrify-lines-max-width", `${s.maxWidthPx}px`);
         target.style.setProperty("--lyrify-line-dim-opacity", String(s.inactiveOpacityPct / 100));
-        target.classList.toggle("s-fullscreen", s.fullscreen);
         target.classList.toggle("s-vibrant-enabled", s.vibrant);
         target.classList.toggle("s-highlight-enabled", s.highlightActive);
         const scrollWrap = target.querySelector("#lyrify-scroll-wrap") || document.getElementById("lyrify-scroll-wrap");
@@ -1344,7 +1536,6 @@
       localStorage.setItem(LS_UI_BRIGHT, String(Number(brightRange.value) / 100));
       localStorage.setItem(LS_UI_AUTO, autoScrollCb.checked ? "1" : "0");
       localStorage.setItem(LS_UI_DEBUG, showDebugCb.checked ? "1" : "0");
-      localStorage.setItem(LS_UI_FULLSCREEN, fullscreenCb.checked ? "1" : "0");
       localStorage.setItem(LS_UI_AUTOGEN, autogenCb.checked ? "1" : "0");
       localStorage.setItem(LS_UI_EDGE_FADE, edgeFadeCb.checked ? "1" : "0");
       localStorage.setItem(LS_UI_VIBRANT, vibrantCb.checked ? "1" : "0");
@@ -1359,7 +1550,7 @@
       if (onLayoutChange) setTimeout(() => onLayoutChange(false), 500);
     };
     [fontRange, blurRange, brightRange, lineGapRange, maxWidthRange, inactiveOpRange].forEach((input) => input.oninput = persist);
-    [autoScrollCb, showDebugCb, fullscreenCb, autogenCb, edgeFadeCb, vibrantCb, highlightActiveCb].forEach((cb) => cb.onchange = persist);
+    [autoScrollCb, showDebugCb, autogenCb, edgeFadeCb, vibrantCb, highlightActiveCb].forEach((cb) => cb.onchange = persist);
     nicknameInput.oninput = persist;
     recordCb.onchange = () => {
       if (manualSync) {
@@ -1522,6 +1713,10 @@
   }
 
   // src/components/Overlay.ts
+  var SVG_PREV = `<svg viewBox="0 0 16 16"><path d="M12.7 1a.7.7 0 0 0-.7.7v5.15L3.483 1.141a.7.7 0 0 0-1.083.593v12.532a.7.7 0 0 0 1.083.593L12 9.15V14.3a.7.7 0 0 0 .7.7h1.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-1.6z"/></svg>`;
+  var SVG_NEXT = `<svg viewBox="0 0 16 16"><path d="M3.3 1a.7.7 0 0 1 .7.7v5.15l8.517-5.709a.7.7 0 0 1 1.083.593v12.532a.7.7 0 0 1-1.083.593L4 9.15V14.3a.7.7 0 0 1-.7.7H1.6a.7.7 0 0 1-.7-.7V1.7a.7.7 0 0 1 .7-.7H3.3z"/></svg>`;
+  var SVG_PLAY = `<svg viewBox="0 0 16 16"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894a.7.7 0 0 1-1.05-.607V1.713z"/></svg>`;
+  var SVG_PAUSE = `<svg viewBox="0 0 16 16"><path d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm7.4 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z"/></svg>`;
   function createOverlay(options) {
     const overlay = h("div", { id: "lyrify-overlay", style: { display: "none" } });
     const card = h("div", { id: "lyrify-card" });
@@ -1531,8 +1726,10 @@
     const header = h("div", { id: "lyrify-header" });
     const headerTitleEl = h("div", { id: "lyrify-title" });
     const headerRight = h("div", { id: "lyrify-header-right" });
+    const splitViewBtn = h("button", { id: "lyrify-splitview-toggle", title: "Immersive Split-screen" }, "\u26F6");
     const miniBtn = h("button", { id: "lyrify-mini-toggle" }, "Mini");
     const settingsBtn = h("button", { id: "lyrify-settings-toggle", title: "Display settings" }, "\u2699");
+    headerRight.appendChild(splitViewBtn);
     headerRight.appendChild(miniBtn);
     headerRight.appendChild(settingsBtn);
     header.appendChild(headerTitleEl);
@@ -1555,8 +1752,8 @@
       }
     });
     scrollInner.appendChild(linesEl);
-    scrollInner.appendChild(jumpNowBtn);
     scrollWrap.appendChild(scrollInner);
+    scrollWrap.appendChild(jumpNowBtn);
     body.appendChild(meta);
     body.appendChild(scrollWrap);
     body.appendChild(debugInfo);
@@ -1577,11 +1774,74 @@
       const blob = h("div", { className: `lyrify-blob lyrify-blob-${i}` });
       vibrantBg.appendChild(blob);
     }
-    card.appendChild(loadingBar);
-    card.appendChild(header);
-    card.appendChild(settingsPanel.element);
-    card.appendChild(body);
+    const leftPanel = h("div", { id: "lyrify-left-panel" });
+    const coverWrap = h("div", { id: "lyrify-fs-cover-wrap" });
+    const coverArt = h("img", { id: "lyrify-fs-cover", src: "" });
+    const coverOverlay = h("div", { id: "lyrify-fs-cover-overlay" });
+    const trackTitle = h("div", { id: "lyrify-fs-title" }, "-");
+    const trackArtist = h("div", { id: "lyrify-fs-artist" }, "-");
+    const seekSection = h("div", { id: "lyrify-fs-seek" });
+    const seekCurrent = h("div", { className: "lyrify-fs-time" }, "0:00");
+    const seekRange = h("input", { type: "range", min: "0", max: "1000", step: "1", value: "0" });
+    const seekTotal = h("div", { className: "lyrify-fs-time" }, "0:00");
+    seekSection.appendChild(seekCurrent);
+    seekSection.appendChild(seekRange);
+    seekSection.appendChild(seekTotal);
+    const btnPrev = h("button", { className: "lyrify-fs-btn", title: "Previous" });
+    const btnPlay = h("button", { className: "lyrify-fs-btn s-play", title: "Play / Pause" });
+    const btnNext = h("button", { className: "lyrify-fs-btn", title: "Next" });
+    btnPrev.innerHTML = SVG_PREV;
+    btnPlay.innerHTML = SVG_PLAY;
+    btnNext.innerHTML = SVG_NEXT;
+    coverOverlay.appendChild(btnPrev);
+    coverOverlay.appendChild(btnPlay);
+    coverOverlay.appendChild(btnNext);
+    coverWrap.appendChild(coverArt);
+    coverWrap.appendChild(coverOverlay);
+    leftPanel.appendChild(coverWrap);
+    leftPanel.appendChild(seekSection);
+    leftPanel.appendChild(trackTitle);
+    leftPanel.appendChild(trackArtist);
+    btnPrev.onclick = () => {
+      window.Spicetify.Player.back();
+      isAutoFollowEnabled = true;
+    };
+    btnPlay.onclick = () => {
+      window.Spicetify.Player.togglePlay();
+    };
+    btnNext.onclick = () => {
+      window.Spicetify.Player.next();
+      isAutoFollowEnabled = true;
+    };
+    let isSeekDragging = false;
+    seekRange.onpointerdown = () => {
+      isSeekDragging = true;
+    };
+    seekRange.onpointerup = () => {
+      isSeekDragging = false;
+    };
+    seekRange.oninput = () => {
+      const dur = window.Spicetify.Player.getDuration();
+      const val = Number(seekRange.value);
+      seekCurrent.textContent = formatMs(Math.floor(val / 1e3 * dur));
+      seekRange.style.setProperty("--progress", `${val / 10}%`);
+    };
+    seekRange.onchange = () => {
+      const dur = window.Spicetify.Player.getDuration();
+      const val = Number(seekRange.value);
+      window.Spicetify.Player.seek(Math.floor(val / 1e3 * dur));
+    };
+    const rightWrap = h("div", { className: "lyrify-right-wrap" });
+    rightWrap.appendChild(loadingBar);
+    rightWrap.appendChild(header);
+    rightWrap.appendChild(settingsPanel.element);
+    rightWrap.appendChild(body);
+    card.appendChild(leftPanel);
+    card.appendChild(rightWrap);
+    const exitFsBtn = h("div", { className: "lyrify-fs-exit-btn", title: "Exit Full Screen" });
+    exitFsBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M16 10l-4 4-4-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     overlay.appendChild(vibrantBg);
+    overlay.appendChild(exitFsBtn);
     overlay.appendChild(card);
     overlay.appendChild(recordHud.element);
     let currentDebugText = "";
@@ -1599,6 +1859,7 @@
         return;
       }
       const result = await extractDominantColorFromImage(imageUrl);
+      coverArt.src = imageUrl;
       if (!result) return;
       const { dominant, palette } = result;
       const { r, g, b } = dominant;
@@ -1705,6 +1966,55 @@
     });
     settingsBtn.onclick = () => settingsPanel.toggle();
     miniBtn.onclick = () => options.toggleMini();
+    let isSplitView = false;
+    const toggleSplitView = () => {
+      isSplitView = !isSplitView;
+      overlay.classList.toggle("s-split-view", isSplitView);
+    };
+    let mouseTimer = null;
+    overlay.addEventListener("mousemove", () => {
+      if (!isSplitView) return;
+      overlay.classList.add("s-mouse-active");
+      clearTimeout(mouseTimer);
+      mouseTimer = setTimeout(() => {
+        overlay.classList.remove("s-mouse-active");
+      }, 2500);
+    });
+    splitViewBtn.onclick = toggleSplitView;
+    exitFsBtn.onclick = toggleSplitView;
+    let lastPlayState = null;
+    const syncLoop = () => {
+      var _a2, _b, _c, _d;
+      if (isSplitView) {
+        const spc = window.Spicetify.Player;
+        const progressMs = spc.getProgress();
+        const durationMs = spc.getDuration();
+        const isPlaying = spc.isPlaying();
+        const trackInfo = ((_b = (_a2 = spc.data) == null ? void 0 : _a2.track) == null ? void 0 : _b.metadata) || {};
+        const itemInfo = ((_c = spc.data) == null ? void 0 : _c.item) || {};
+        if (lastPlayState !== isPlaying) {
+          btnPlay.innerHTML = isPlaying ? SVG_PAUSE : SVG_PLAY;
+          lastPlayState = isPlaying;
+        }
+        if (!isSeekDragging) {
+          const curStr = formatMs(progressMs);
+          const totStr = formatMs(durationMs);
+          if (seekCurrent.textContent !== curStr) seekCurrent.textContent = curStr;
+          if (seekTotal.textContent !== totStr) seekTotal.textContent = totStr;
+          const rawVal = durationMs > 0 ? progressMs / durationMs * 1e3 : 0;
+          const valStr = String(rawVal);
+          if (seekRange.value !== valStr) seekRange.value = valStr;
+          seekRange.style.setProperty("--progress", `${rawVal / 10}%`);
+        }
+        const fallbackArtist = safeText((_d = itemInfo == null ? void 0 : itemInfo.artists) == null ? void 0 : _d.map((a) => safeText(a == null ? void 0 : a.name)).join(", "));
+        const newTitle = trackInfo.title || (itemInfo == null ? void 0 : itemInfo.name) || "-";
+        const newArtist = trackInfo.artist_name || fallbackArtist || "-";
+        if (trackTitle.textContent !== newTitle) trackTitle.textContent = newTitle;
+        if (trackArtist.textContent !== newArtist) trackArtist.textContent = newArtist;
+      }
+      setTimeout(syncLoop, 100);
+    };
+    syncLoop();
     jumpNowBtn.onclick = () => {
       isAutoFollowEnabled = true;
       const active = linesEl.querySelector(".s-active");
@@ -1719,6 +2029,10 @@
     };
     return {
       element: overlay,
+      resetSplitView: () => {
+        isSplitView = false;
+        overlay.classList.remove("s-split-view");
+      },
       setHeader: (text) => {
         headerTitleEl.textContent = text;
       },
@@ -1820,12 +2134,15 @@
       }
     };
   }
+  function safeText(s) {
+    return typeof s === "string" ? s.trim() : "";
+  }
 
   // src/components/MiniPlayer.ts
-  var SVG_PREV = `<svg viewBox="0 0 16 16"><path d="M12.7 1a.7.7 0 0 0-.7.7v5.15L3.483 1.141a.7.7 0 0 0-1.083.593v12.532a.7.7 0 0 0 1.083.593L12 9.15V14.3a.7.7 0 0 0 .7.7h1.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-1.6z"/></svg>`;
-  var SVG_NEXT = `<svg viewBox="0 0 16 16"><path d="M3.3 1a.7.7 0 0 1 .7.7v5.15l8.517-5.709a.7.7 0 0 1 1.083.593v12.532a.7.7 0 0 1-1.083.593L4 9.15V14.3a.7.7 0 0 1-.7.7H1.6a.7.7 0 0 1-.7-.7V1.7a.7.7 0 0 1 .7-.7H3.3z"/></svg>`;
-  var SVG_PLAY = `<svg viewBox="0 0 16 16"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894a.7.7 0 0 1-1.05-.607V1.713z"/></svg>`;
-  var SVG_PAUSE = `<svg viewBox="0 0 16 16"><path d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm7.4 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z"/></svg>`;
+  var SVG_PREV2 = `<svg viewBox="0 0 16 16"><path d="M12.7 1a.7.7 0 0 0-.7.7v5.15L3.483 1.141a.7.7 0 0 0-1.083.593v12.532a.7.7 0 0 0 1.083.593L12 9.15V14.3a.7.7 0 0 0 .7.7h1.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-1.6z"/></svg>`;
+  var SVG_NEXT2 = `<svg viewBox="0 0 16 16"><path d="M3.3 1a.7.7 0 0 1 .7.7v5.15l8.517-5.709a.7.7 0 0 1 1.083.593v12.532a.7.7 0 0 1-1.083.593L4 9.15V14.3a.7.7 0 0 1-.7.7H1.6a.7.7 0 0 1-.7-.7V1.7a.7.7 0 0 1 .7-.7H3.3z"/></svg>`;
+  var SVG_PLAY2 = `<svg viewBox="0 0 16 16"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894a.7.7 0 0 1-1.05-.607V1.713z"/></svg>`;
+  var SVG_PAUSE2 = `<svg viewBox="0 0 16 16"><path d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm7.4 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z"/></svg>`;
   var SVG_CLOSE = `<svg viewBox="0 0 16 16"><path d="M14.354 1.646a.5.5 0 0 0-.708 0L8 7.293 2.354 1.646a.5.5 0 0 0-.708.708L7.293 8l-5.647 5.646a.5.5 0 0 0 .708.708L8 8.707l5.646 5.647a.5.5 0 0 0 .708-.708L8.707 8l5.647-5.646a.5.5 0 0 0 0-.708z"/></svg>`;
   function createMiniPlayer(options = {}) {
     const mini = h("div", { id: "lyrify-mini" });
@@ -1854,9 +2171,9 @@
     const miniPrev = h("button", { className: "lyrify-mini-icon-btn", title: "Previous" });
     const miniPlay = h("button", { className: "lyrify-mini-icon-btn s-play", title: "Play / Pause" });
     const miniNext = h("button", { className: "lyrify-mini-icon-btn", title: "Next" });
-    miniPrev.innerHTML = SVG_PREV;
-    miniPlay.innerHTML = SVG_PLAY;
-    miniNext.innerHTML = SVG_NEXT;
+    miniPrev.innerHTML = SVG_PREV2;
+    miniPlay.innerHTML = SVG_PLAY2;
+    miniNext.innerHTML = SVG_NEXT2;
     actions.appendChild(miniPrev);
     actions.appendChild(miniPlay);
     actions.appendChild(miniNext);
@@ -1963,7 +2280,7 @@
       miniSeekCurrent.textContent = formatMs(progressMs);
       miniSeekTotal.textContent = formatMs(durationMs);
       miniSeekRange.value = String(durationMs > 0 ? progressMs / durationMs * 1e3 : 0);
-      miniPlay.innerHTML = isPlaying ? SVG_PAUSE : SVG_PLAY;
+      miniPlay.innerHTML = isPlaying ? SVG_PAUSE2 : SVG_PLAY2;
       const needsRebuild = lyrics.trackKey !== lastTrackKey || lyrics.lines.length > 0 && scroll.children.length === 0;
       if (needsRebuild && lyrics.lines.length > 0) {
         scroll.innerHTML = "";
@@ -2038,19 +2355,19 @@
         (_r = ps == null ? void 0 : ps.context_metadata) == null ? void 0 : _r.metadata,
         (_s = ps == null ? void 0 : ps.page_metadata) == null ? void 0 : _s.metadata
       ];
-      const safeText = (s) => typeof s === "string" ? s.trim() : "";
+      const safeText2 = (s) => typeof s === "string" ? s.trim() : "";
       const firstNonEmptyString = (objects, keys) => {
         for (const obj of objects) {
           if (!obj || typeof obj !== "object") continue;
           for (const k of keys) {
             const v = obj[k];
-            const t = safeText(v);
+            const t = safeText2(v);
             if (t) return t;
           }
         }
         return "";
       };
-      const artistFromArray = safeText((_u = (_t = ps == null ? void 0 : ps.item) == null ? void 0 : _t.artists) == null ? void 0 : _u.map((a) => safeText(a == null ? void 0 : a.name)).filter(Boolean).join(", ")) || safeText((_v = queueTrack == null ? void 0 : queueTrack.artists) == null ? void 0 : _v.map((a) => safeText(a == null ? void 0 : a.name)).filter(Boolean).join(", "));
+      const artistFromArray = safeText2((_u = (_t = ps == null ? void 0 : ps.item) == null ? void 0 : _t.artists) == null ? void 0 : _u.map((a) => safeText2(a == null ? void 0 : a.name)).filter(Boolean).join(", ")) || safeText2((_v = queueTrack == null ? void 0 : queueTrack.artists) == null ? void 0 : _v.map((a) => safeText2(a == null ? void 0 : a.name)).filter(Boolean).join(", "));
       const artist = artistFromArray || firstNonEmptyString(mdCandidates, ["artist_name", "album_artist_name", "artist", "artistName", "name"]);
       const title = firstNonEmptyString(mdCandidates, ["title", "name", "track_name", "trackName"]);
       const durationMsCandidates = [
@@ -3240,6 +3557,7 @@ Status: 404`);
             updateTriggerButtonState(true);
           } else {
             el.style.display = "none";
+            overlay.resetSplitView();
             updateTriggerButtonState(false);
           }
         });
