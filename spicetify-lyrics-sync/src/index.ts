@@ -7,10 +7,10 @@ import { fetchLyricsFromLrclib } from "./lrclibClient";
 import { toTrackKey, autoGenerateTimings, findCurrentLineIndex, LyricsModel, LyricLine } from "./syncModel";
 import { LyricsCache } from "./cache";
 import { SPOTIFY_SELECTORS } from "./selectors";
-import { debounceByAnimationFrame, getOrCreateAuthorId } from "./utils";
+import { debounceByAnimationFrame, getOrCreateAuthorId, generateRandomNickname } from "./utils";
 import { mountInlineTrigger } from "./components/InlineTrigger";
 import { tryFetchNativeSpotifyUiLyrics } from "./components/NativeScraper";
-import { readUiSettings } from "./components/SettingsPanel";
+import { readUiSettings, LS_CONTRIBUTOR_NICKNAME } from "./components/SettingsPanel";
 import { createManualSyncController } from "./manualSync";
 
 const BACKEND_BASE_URL = "https://lyrify-api.aquashield.lol";

@@ -457,6 +457,16 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
+    if (req.method === "DELETE" && url.pathname.startsWith("/admin/request/")) {
+        if (!requireAdmin(req, url)) return sendJson(res, 403, { error: "forbidden" });
+        const trackKey = url.pathname.slice("/admin/request/".length);
+        if (!trackKey) return sendJson(res, 400, { error: "trackKey required" });
+        
+        const result = db.prepare("DELETE FROM syncRequests WHERE trackKey = ?").run(trackKey);
+        sendJson(res, 200, { ok: true, deleted: result.changes });
+        return;
+    }
+
     // --- Versioning ---
 
     if (req.method === "GET" && url.pathname === "/versions") {

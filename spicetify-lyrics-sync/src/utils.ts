@@ -99,3 +99,11 @@ export function getOrCreateAuthorId(): string {
     }
     return id;
 }
+
+export function generateRandomNickname(): string {
+    const adj = ["Shiny", "Golden", "Swift", "Quiet", "Bold", "Lively", "Wild", "Frosty", "Misty", "Vibrant", "Kind", "Cool", "Epic", "Magic", "Solar", "Lunar", "Super", "Elite", "Grand", "Cosmic"];
+    const nouns = ["Panda", "Fox", "Eagle", "Wolf", "Tiger", "Bear", "Owl", "Deer", "Lynx", "Falcon", "Koala", "Otter", "Lion", "Shark", "Raven", "Dolphin", "Phoenix", "Leopard", "Cobra", "Dragon"];
+    const a = adj[Math.floor(Math.random() * adj.length)];
+    const n = nouns[Math.floor(Math.random() * nouns.length)];
+    return `${a} ${n}`;
+}
