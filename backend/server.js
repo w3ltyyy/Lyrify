@@ -272,6 +272,8 @@ const server = http.createServer(async (req, res) => {
       const { authorId, authorNickname } = body;
       const now = Date.now();
       
+      console.log(`[lyrify] Telemetry: id=${authorId}, nick=${authorNickname}`);
+
       db.transaction(() => {
           db.prepare("INSERT OR IGNORE INTO telemetry (date, dau, requests) VALUES (?, 0, 0)").run(today);
           db.prepare("UPDATE telemetry SET requests = requests + 1 WHERE date = ?").run(today);
@@ -290,7 +292,7 @@ const server = http.createServer(async (req, res) => {
                   VALUES (?, ?, 0, ?, ?, 0)
                   ON CONFLICT(authorId) DO UPDATE SET
                     lastActive = excluded.lastActive,
-                    nickname = coalesce(excluded.nickname, users.nickname)
+                    nickname = CASE WHEN excluded.nickname IS NOT NULL AND excluded.nickname != '' THEN excluded.nickname ELSE users.nickname END
               `).run(authorId, authorNickname || null, now, now);
           }
       })();

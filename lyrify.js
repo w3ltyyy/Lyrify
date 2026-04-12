@@ -3260,7 +3260,7 @@
   var miniOpen = false;
   async function startExtension() {
     var _a2, _b, _c, _d;
-    console.info("[lyrify] Initializing v1.2.3");
+    console.info("[lyrify] Initializing v1.2.4");
     if (isStarted) return;
     isStarted = true;
     try {
