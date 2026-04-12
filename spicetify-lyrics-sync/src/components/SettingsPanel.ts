@@ -22,7 +22,6 @@ export function readUiSettings() {
     brightness: Math.min(1.35, Math.max(0.75, Number(localStorage.getItem(LS_UI_BRIGHT) || "1") || 1)),
     autoScroll: localStorage.getItem(LS_UI_AUTO) !== "0",
     showDebug: localStorage.getItem(LS_UI_DEBUG) === "1",
-    showDebug: localStorage.getItem(LS_UI_DEBUG) === "1",
     lineGapPx: Math.min(28, Math.max(8, Number(localStorage.getItem(LS_UI_LINE_GAP) || "14") || 14)),
     maxWidthPx: Math.min(960, Math.max(480, Number(localStorage.getItem(LS_UI_MAX_W) || "720") || 720)),
     inactiveOpacityPct: Math.min(55, Math.max(15, Number(localStorage.getItem(LS_UI_INACTIVE_OP) || "38") || 38)),

@@ -7,7 +7,6 @@ export type Settings = {
   autoScroll: boolean;
   showDebug: boolean;
   fullscreen: boolean;
-  fullscreen: boolean;
   lineGapPx: number;
   maxWidthPx: number;
   inactiveOpacityPct: number;
@@ -44,7 +43,6 @@ export const DEFAULT_SETTINGS: Settings = {
   autoScroll: true,
   showDebug: false,
   fullscreen: true,
-  fullscreen: true,
   lineGapPx: 14,
   maxWidthPx: 720,
   inactiveOpacityPct: 38,
@@ -72,7 +70,6 @@ class StateManager {
         brightness: Math.min(1.35, Math.max(0.75, Number(localStorage.getItem(LS_KEYS.BRIGHT) || "1") || 1)),
         autoScroll: localStorage.getItem(LS_KEYS.AUTO) !== "0",
         showDebug: localStorage.getItem(LS_KEYS.DEBUG) === "1",
-        fullscreen: localStorage.getItem(LS_KEYS.FULLSCREEN) !== "0",
         fullscreen: localStorage.getItem(LS_KEYS.FULLSCREEN) !== "0",
         lineGapPx: Math.min(28, Math.max(8, Number(localStorage.getItem(LS_KEYS.LINE_GAP) || "14") || 14)),
         maxWidthPx: Math.min(960, Math.max(480, Number(localStorage.getItem(LS_KEYS.MAX_W) || "720") || 720)),
