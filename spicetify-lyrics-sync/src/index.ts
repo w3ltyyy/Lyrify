@@ -478,7 +478,8 @@ async function startExtension() {
                 state.setLyrics({
                     trackKey,
                     lines: [{ text: "Кажется, мы не нашли текст к этой песне :(", startTime: null }],
-                    synced: false
+                    synced: false,
+                    isNotFound: true
                 });
                 overlay.render(miniOpen);
                 sendMissingPing(trackKey, info.artist, info.title);

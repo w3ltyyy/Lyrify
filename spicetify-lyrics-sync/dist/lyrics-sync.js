@@ -2160,7 +2160,7 @@
           lastLyricsKey = lyricsKey;
           scrollInner.scrollTop = 0;
         }
-        const shouldShowReq = !isMiniOpen && !lyrics.synced && lyrics.lines.length > 0 && lyrics.trackKey && lyrics.trackKey !== "none";
+        const shouldShowReq = !isMiniOpen && !lyrics.isNotFound && !lyrics.synced && lyrics.lines.length > 0 && lyrics.trackKey && lyrics.trackKey !== "none";
         if (shouldShowReq) {
           reqSyncBtn.classList.add("s-visible");
           reqSyncBtn.onclick = () => {
@@ -3612,7 +3612,8 @@ Status: 404`);
           state.setLyrics({
             trackKey,
             lines: [{ text: "\u041A\u0430\u0436\u0435\u0442\u0441\u044F, \u043C\u044B \u043D\u0435 \u043D\u0430\u0448\u043B\u0438 \u0442\u0435\u043A\u0441\u0442 \u043A \u044D\u0442\u043E\u0439 \u043F\u0435\u0441\u043D\u0435 :(", startTime: null }],
-            synced: false
+            synced: false,
+            isNotFound: true
           });
           overlay.render(miniOpen);
           sendMissingPing(trackKey, info.artist, info.title);

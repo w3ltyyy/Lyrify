@@ -8,6 +8,7 @@ export type LyricsModel = {
   lines: LyricLine[];
   synced: boolean;
   authorNickname?: string;
+  isNotFound?: boolean;
 };
 
 export function toTrackKey(artist: string, title: string, durationSeconds?: number): string {

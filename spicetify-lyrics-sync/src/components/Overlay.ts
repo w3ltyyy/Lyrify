@@ -452,7 +452,7 @@ export function createOverlay(options: {
       }
 
       // Handle Request Sync visibility and animation
-      const shouldShowReq = !isMiniOpen && !lyrics.synced && lyrics.lines.length > 0 && lyrics.trackKey && lyrics.trackKey !== "none";
+      const shouldShowReq = !isMiniOpen && !lyrics.isNotFound && !lyrics.synced && lyrics.lines.length > 0 && lyrics.trackKey && lyrics.trackKey !== "none";
       if (shouldShowReq) {
           reqSyncBtn.classList.add("s-visible");
           reqSyncBtn.onclick = () => {
