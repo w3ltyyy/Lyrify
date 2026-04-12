@@ -66,7 +66,9 @@ db.exec(`
         authorId TEXT PRIMARY KEY,
         nickname TEXT,
         karma INTEGER DEFAULT 0,
-        lastActive INTEGER
+        lastActive INTEGER,
+        createdAt INTEGER,
+        plays INTEGER DEFAULT 0
     );
     CREATE TABLE IF NOT EXISTS geo (
         countryCode TEXT PRIMARY KEY,
@@ -268,24 +270,23 @@ const server = http.createServer(async (req, res) => {
       const body = await readBodyJson(req);
       const today = new Date().toISOString().split("T")[0];
       const { authorId, authorNickname } = body;
+      const now = Date.now();
       
       db.transaction(() => {
           db.prepare("INSERT OR IGNORE INTO telemetry (date, dau, requests) VALUES (?, 0, 0)").run(today);
           db.prepare("UPDATE telemetry SET requests = requests + 1 WHERE date = ?").run(today);
           
           if (authorId) {
-              // Note: For true DAU we'd need a sub-table of users per day, 
-              // but let's keep it simple: if lastActive was != today, increment DAU.
-              const user = db.prepare("SELECT lastActive FROM users WHERE authorId = ?").get(authorId);
+              const user = db.prepare("SELECT lastActive, createdAt FROM users WHERE authorId = ?").get(authorId);
               const lastDate = user ? new Date(user.lastActive).toISOString().split("T")[0] : "";
               if (lastDate !== today) {
                   db.prepare("UPDATE telemetry SET dau = dau + 1 WHERE date = ?").run(today);
               }
 
-              db.prepare("INSERT OR IGNORE INTO users (authorId, nickname, karma, lastActive) VALUES (?, ?, 0, ?)")
-                .run(authorId, authorNickname || "Anonymous", Date.now());
+              db.prepare("INSERT OR IGNORE INTO users (authorId, nickname, karma, lastActive, createdAt, plays) VALUES (?, ?, 0, ?, ?, 0)")
+                .run(authorId, authorNickname || "Anonymous", now, now);
               db.prepare("UPDATE users SET lastActive = ?, nickname = coalesce(?, nickname) WHERE authorId = ?")
-                .run(Date.now(), authorNickname, authorId);
+                .run(now, authorNickname, authorId);
           }
       })();
       
@@ -318,17 +319,22 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === "POST" && url.pathname === "/track-play") {
-        const { trackKey, artist, title, hasSynced, uri } = await readBodyJson(req);
+        const { trackKey, artist, title, hasSynced, uri, authorId } = await readBodyJson(req);
         const storageKey = uri || trackKey;
+        const now = Date.now();
         if (storageKey) {
             db.transaction(() => {
                 db.prepare("INSERT OR IGNORE INTO trackActivity (uri, trackKey, artist, title, syncedHits, unsyncedHits, lastPlayed) VALUES (?, ?, ?, ?, 0, 0, ?)")
-                  .run(storageKey, trackKey || "", artist || "", title || "", Date.now());
+                  .run(storageKey, trackKey || "", artist || "", title || "", now);
                 
                 if (hasSynced) {
-                    db.prepare("UPDATE trackActivity SET syncedHits = syncedHits + 1, lastPlayed = ? WHERE uri = ?").run(Date.now(), storageKey);
+                    db.prepare("UPDATE trackActivity SET syncedHits = syncedHits + 1, lastPlayed = ? WHERE uri = ?").run(now, storageKey);
                 } else {
-                    db.prepare("UPDATE trackActivity SET unsyncedHits = unsyncedHits + 1, lastPlayed = ? WHERE uri = ?").run(Date.now(), storageKey);
+                    db.prepare("UPDATE trackActivity SET unsyncedHits = unsyncedHits + 1, lastPlayed = ? WHERE uri = ?").run(now, storageKey);
+                }
+
+                if (authorId) {
+                    db.prepare("UPDATE users SET plays = plays + 1, lastActive = ? WHERE authorId = ?").run(now, authorId);
                 }
 
                 // GeoIP Tracking
@@ -344,6 +350,19 @@ const server = http.createServer(async (req, res) => {
             })();
         }
         sendJson(res, 200, { ok: true });
+        return;
+    }
+
+    if (req.method === "GET" && url.pathname === "/admin/members") {
+        if (!requireAdmin(req, url)) return sendJson(res, 403, { error: "forbidden" });
+        const sortBy = url.searchParams.get("sortBy") || "lastActive";
+        const order = url.searchParams.get("order") || "desc";
+        
+        const validCols = ["nickname", "karma", "lastActive", "createdAt", "plays"];
+        if (!validCols.includes(sortBy)) return sendJson(res, 400, { error: "invalid sort col" });
+        
+        const rows = db.prepare(`SELECT * FROM users ORDER BY ${sortBy} ${order === "asc" ? "ASC" : "DESC"} LIMIT 1000`).all();
+        sendJson(res, 200, { ok: true, members: rows });
         return;
     }
 

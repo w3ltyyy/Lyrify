@@ -356,7 +356,7 @@ async function startExtension() {
                 fetch(`${BACKEND_BASE_URL}/track-play`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ trackKey, artist: artist, title: title, hasSynced, uri })
+                    body: JSON.stringify({ trackKey, artist, title, hasSynced, uri, authorId: getOrCreateAuthorId() })
                 }).catch(() => { });
             };
 
@@ -545,7 +545,12 @@ async function startExtension() {
         const platHist: any = w.Spicetify?.Platform?.History;
         if (platHist?.listen) {
             platHist.listen(() => {
-                // Any history change (forward/back/click) hides the overlay
+                hideOnNav();
+            });
+        }
+        // Fallback or additional listener for some Spotify versions
+        if (w.Spicetify?.History?.listen) {
+            w.Spicetify.History.listen(() => {
                 hideOnNav();
             });
         }

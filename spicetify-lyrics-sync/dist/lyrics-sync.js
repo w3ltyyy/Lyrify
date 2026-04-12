@@ -3259,7 +3259,7 @@
   var highlightTimer = null;
   var miniOpen = false;
   async function startExtension() {
-    var _a2, _b;
+    var _a2, _b, _c, _d;
     if (isStarted) return;
     isStarted = true;
     try {
@@ -3485,7 +3485,7 @@ ${msg}`;
           fetch(`${BACKEND_BASE_URL}/track-play`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ trackKey: trackKey2, artist, title, hasSynced, uri })
+            body: JSON.stringify({ trackKey: trackKey2, artist, title, hasSynced, uri, authorId: getOrCreateAuthorId() })
           }).catch(() => {
           });
         };
@@ -3583,12 +3583,12 @@ Lines: ${model.lines.length}`);
             const nativeLines = await tryFetchNativeSpotifyUiLyrics({
               signal,
               restoreNativeLyrics: () => {
-                var _a3, _b2, _c, _d;
-                return (_d = (_c = (_b2 = (_a3 = window.Spicetify) == null ? void 0 : _a3.Player) == null ? void 0 : _b2.origin) == null ? void 0 : _c.restoreNativeLyrics) == null ? void 0 : _d.call(_c);
+                var _a3, _b2, _c2, _d2;
+                return (_d2 = (_c2 = (_b2 = (_a3 = window.Spicetify) == null ? void 0 : _a3.Player) == null ? void 0 : _b2.origin) == null ? void 0 : _c2.restoreNativeLyrics) == null ? void 0 : _d2.call(_c2);
               },
               hideNativeLyrics: () => {
-                var _a3, _b2, _c, _d;
-                return (_d = (_c = (_b2 = (_a3 = window.Spicetify) == null ? void 0 : _a3.Player) == null ? void 0 : _b2.origin) == null ? void 0 : _c.hideNativeLyrics) == null ? void 0 : _d.call(_c);
+                var _a3, _b2, _c2, _d2;
+                return (_d2 = (_c2 = (_b2 = (_a3 = window.Spicetify) == null ? void 0 : _a3.Player) == null ? void 0 : _b2.origin) == null ? void 0 : _c2.hideNativeLyrics) == null ? void 0 : _d2.call(_c2);
               },
               overlayIsOpen: () => overlay.element.style.display !== "none"
             });
@@ -3660,17 +3660,22 @@ Status: 404`);
         miniPlayer.render();
       });
       const hideOnNav = () => {
-        var _a3, _b2, _c, _d;
+        var _a3, _b2, _c2, _d2;
         if (isScrubbingNative) return;
         overlay.element.style.display = "none";
         miniOpen = false;
         if (miniPlayer.element) miniPlayer.element.classList.remove("s-open");
         updateTriggerButtonState(false);
-        (_d = (_c = (_b2 = (_a3 = window.Spicetify) == null ? void 0 : _a3.Player) == null ? void 0 : _b2.origin) == null ? void 0 : _c.restoreNativeLyrics) == null ? void 0 : _d.call(_c);
+        (_d2 = (_c2 = (_b2 = (_a3 = window.Spicetify) == null ? void 0 : _a3.Player) == null ? void 0 : _b2.origin) == null ? void 0 : _c2.restoreNativeLyrics) == null ? void 0 : _d2.call(_c2);
       };
       const platHist = (_b = (_a2 = w.Spicetify) == null ? void 0 : _a2.Platform) == null ? void 0 : _b.History;
       if (platHist == null ? void 0 : platHist.listen) {
         platHist.listen(() => {
+          hideOnNav();
+        });
+      }
+      if ((_d = (_c = w.Spicetify) == null ? void 0 : _c.History) == null ? void 0 : _d.listen) {
+        w.Spicetify.History.listen(() => {
           hideOnNav();
         });
       }

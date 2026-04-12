@@ -60,7 +60,9 @@ db.exec(`
         authorId TEXT PRIMARY KEY,
         nickname TEXT,
         karma INTEGER DEFAULT 0,
-        lastActive INTEGER
+        lastActive INTEGER,
+        createdAt INTEGER,
+        plays INTEGER DEFAULT 0
     );
     CREATE TABLE IF NOT EXISTS geo (
         countryCode TEXT PRIMARY KEY,
@@ -81,7 +83,7 @@ const insertSub = db.prepare("INSERT OR REPLACE INTO submissions (id, trackKey, 
 const insertTel = db.prepare("INSERT OR REPLACE INTO telemetry (date, dau, requests) VALUES (?, ?, ?)");
 const insertMiss = db.prepare("INSERT OR REPLACE INTO missingTracks (trackKey, artist, title, count, lastRequested) VALUES (?, ?, ?, ?, ?)");
 const insertAct = db.prepare("INSERT OR REPLACE INTO trackActivity (uri, trackKey, artist, title, syncedHits, unsyncedHits, lastPlayed) VALUES (?, ?, ?, ?, ?, ?, ?)");
-const insertUser = db.prepare("INSERT OR REPLACE INTO users (authorId, nickname, karma, lastActive) VALUES (?, ?, ?, ?)");
+const insertUser = db.prepare("INSERT OR REPLACE INTO users (authorId, nickname, karma, lastActive, createdAt, plays) VALUES (?, ?, ?, ?, ?, ?)");
 
 db.transaction(() => {
     // Sync
@@ -117,7 +119,7 @@ db.transaction(() => {
     // Users
     if (store.users) {
         for (const [k, v] of Object.entries(store.users)) {
-            insertUser.run(k, v.nickname || "Anonymous", v.karma || 0, v.lastActive || Date.now());
+            insertUser.run(k, v.nickname || "Anonymous", v.karma || 0, v.lastActive || Date.now(), v.createdAt || Date.now(), v.plays || 0);
         }
     }
 })();
