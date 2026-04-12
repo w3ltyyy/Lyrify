@@ -108,7 +108,7 @@ let highlightTimer: number | null = null;
 let miniOpen = false;
 
 async function startExtension() {
-    console.info("[lyrify] Initializing v1.2.2");
+    console.info("[lyrify] Initializing v1.2.3");
     if (isStarted) return;
     isStarted = true;
 
@@ -130,8 +130,8 @@ async function startExtension() {
             document.head.appendChild(style);
         }
 
-        // Telemetry heartbeat
-        setTimeout(() => {
+        // Telemetry heartbeat (periodic)
+        const sendTelemetry = () => {
             try {
                 fetch(`${BACKEND_BASE_URL}/telemetry`, {
                     method: "POST",
@@ -142,7 +142,12 @@ async function startExtension() {
                     })
                 }).catch(() => { });
             } catch (e) { }
-        }, 3000);
+        };
+
+        // Initial ping after 3s
+        setTimeout(sendTelemetry, 3000);
+        // Periodic heartbeat every 2 minutes
+        setInterval(sendTelemetry, 2 * 60 * 1000);
 
         const manual = createManualSyncController({
             lines: state.getLyrics().lines, // will be updated in-place via mutations or proxy

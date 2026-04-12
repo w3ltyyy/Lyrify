@@ -3260,7 +3260,7 @@
   var miniOpen = false;
   async function startExtension() {
     var _a2, _b, _c, _d;
-    console.info("[lyrify] Initializing v1.2.2");
+    console.info("[lyrify] Initializing v1.2.3");
     if (isStarted) return;
     isStarted = true;
     try {
@@ -3278,7 +3278,7 @@
         style.textContent = STYLES;
         document.head.appendChild(style);
       }
-      setTimeout(() => {
+      const sendTelemetry = () => {
         try {
           fetch(`${BACKEND_BASE_URL}/telemetry`, {
             method: "POST",
@@ -3291,7 +3291,9 @@
           });
         } catch (e) {
         }
-      }, 3e3);
+      };
+      setTimeout(sendTelemetry, 3e3);
+      setInterval(sendTelemetry, 2 * 60 * 1e3);
       const manual = createManualSyncController({
         lines: state.getLyrics().lines,
         // will be updated in-place via mutations or proxy

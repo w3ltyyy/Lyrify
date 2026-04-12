@@ -277,16 +277,21 @@ const server = http.createServer(async (req, res) => {
           db.prepare("UPDATE telemetry SET requests = requests + 1 WHERE date = ?").run(today);
           
           if (authorId) {
-              const user = db.prepare("SELECT lastActive, createdAt FROM users WHERE authorId = ?").get(authorId);
-              const lastDate = user ? new Date(user.lastActive).toISOString().split("T")[0] : "";
+              // Check for DAU (Daily Active User)
+              const user = db.prepare("SELECT lastActive FROM users WHERE authorId = ?").get(authorId);
+              const lastDate = (user && user.lastActive) ? new Date(user.lastActive).toISOString().split("T")[0] : "";
               if (lastDate !== today) {
                   db.prepare("UPDATE telemetry SET dau = dau + 1 WHERE date = ?").run(today);
               }
 
-              db.prepare("INSERT OR IGNORE INTO users (authorId, nickname, karma, lastActive, createdAt, plays) VALUES (?, ?, 0, ?, ?, 0)")
-                .run(authorId, authorNickname || "Anonymous", now, now);
-              db.prepare("UPDATE users SET lastActive = ?, nickname = coalesce(?, nickname) WHERE authorId = ?")
-                .run(now, authorNickname, authorId);
+              // UPSERT user: update lastActive and nickname, or insert new
+              db.prepare(`
+                  INSERT INTO users (authorId, nickname, karma, lastActive, createdAt, plays)
+                  VALUES (?, ?, 0, ?, ?, 0)
+                  ON CONFLICT(authorId) DO UPDATE SET
+                    lastActive = excluded.lastActive,
+                    nickname = coalesce(excluded.nickname, users.nickname)
+              `).run(authorId, authorNickname || null, now, now);
           }
       })();
       
@@ -334,7 +339,13 @@ const server = http.createServer(async (req, res) => {
                 }
 
                 if (authorId) {
-                    db.prepare("UPDATE users SET plays = plays + 1, lastActive = ? WHERE authorId = ?").run(now, authorId);
+                    db.prepare(`
+                        INSERT INTO users (authorId, nickname, karma, lastActive, createdAt, plays)
+                        VALUES (?, 'Anonymous', 0, ?, ?, 1)
+                        ON CONFLICT(authorId) DO UPDATE SET
+                            plays = plays + 1,
+                            lastActive = excluded.lastActive
+                    `).run(authorId, now, now);
                 }
 
                 // GeoIP Tracking
