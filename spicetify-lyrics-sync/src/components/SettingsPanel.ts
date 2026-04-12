@@ -7,7 +7,6 @@ export const LS_UI_BLUR = "lyrify_ui_blur_px";
 export const LS_UI_BRIGHT = "lyrify_ui_brightness";
 export const LS_UI_AUTO = "lyrify_ui_auto_scroll";
 export const LS_UI_DEBUG = "lyrify_ui_show_debug";
-export const LS_UI_AUTOGEN = "lyrify_ui_autogen_sync";
 export const LS_UI_LINE_GAP = "lyrify_ui_line_gap";
 export const LS_UI_MAX_W = "lyrify_ui_max_width";
 export const LS_UI_INACTIVE_OP = "lyrify_ui_inactive_op_pct";
@@ -23,7 +22,7 @@ export function readUiSettings() {
     brightness: Math.min(1.35, Math.max(0.75, Number(localStorage.getItem(LS_UI_BRIGHT) || "1") || 1)),
     autoScroll: localStorage.getItem(LS_UI_AUTO) !== "0",
     showDebug: localStorage.getItem(LS_UI_DEBUG) === "1",
-    autoGenerate: localStorage.getItem(LS_UI_AUTOGEN) !== "0",
+    showDebug: localStorage.getItem(LS_UI_DEBUG) === "1",
     lineGapPx: Math.min(28, Math.max(8, Number(localStorage.getItem(LS_UI_LINE_GAP) || "14") || 14)),
     maxWidthPx: Math.min(960, Math.max(480, Number(localStorage.getItem(LS_UI_MAX_W) || "720") || 720)),
     inactiveOpacityPct: Math.min(55, Math.max(15, Number(localStorage.getItem(LS_UI_INACTIVE_OP) || "38") || 38)),
@@ -78,7 +77,6 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
 
   const autoScrollCb = h("input", { type: "checkbox" }) as HTMLInputElement;
   const showDebugCb = h("input", { type: "checkbox" }) as HTMLInputElement;
-  const autogenCb = h("input", { type: "checkbox" }) as HTMLInputElement;
   const edgeFadeCb = h("input", { type: "checkbox" }) as HTMLInputElement;
   const vibrantCb = h("input", { type: "checkbox" }) as HTMLInputElement;
   const recordCb = h("input", { type: "checkbox" }) as HTMLInputElement;
@@ -111,7 +109,6 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
   appearanceSection.appendChild(row("Highlight active line", highlightActiveCb, h("span")));
 
   syncSection.appendChild(h("div", { className: "lyrify-settings-subtitle" }, "Sync engine"));
-  syncSection.appendChild(row("Auto-generate", autogenCb, h("span")));
   if (manualSync) {
       syncSection.appendChild(row("Recording Mode", recordCb, h("span")));
   }
@@ -142,7 +139,6 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
     brightVal.textContent = `${Math.round(s.brightness * 100)}%`;
     autoScrollCb.checked = s.autoScroll;
     showDebugCb.checked = s.showDebug;
-    autogenCb.checked = s.autoGenerate;
     edgeFadeCb.checked = s.edgeFade;
     lineGapRange.value = String(s.lineGapPx);
     lineGapVal.textContent = `${s.lineGapPx}px`;
@@ -181,7 +177,6 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
         brightness: Number(brightRange.value) / 100,
         autoScroll: autoScrollCb.checked,
         showDebug: showDebugCb.checked,
-        autoGenerate: autogenCb.checked,
         edgeFade: edgeFadeCb.checked,
         lineGapPx: Number(lineGapRange.value),
         maxWidthPx: Number(maxWidthRange.value),
@@ -197,7 +192,7 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
   };
 
   [fontRange, blurRange, brightRange, lineGapRange, maxWidthRange, inactiveOpRange].forEach(input => input.oninput = persist);
-  [autoScrollCb, showDebugCb, autogenCb, edgeFadeCb, vibrantCb, highlightActiveCb].forEach(cb => cb.onchange = persist);
+  [autoScrollCb, showDebugCb, edgeFadeCb, vibrantCb, highlightActiveCb].forEach(cb => cb.onchange = persist);
   nicknameInput.oninput = persist;
 
   recordCb.onchange = () => {

@@ -10,7 +10,7 @@ import { SPOTIFY_SELECTORS } from "./selectors";
 import { debounceByAnimationFrame, getOrCreateAuthorId, generateRandomNickname } from "./utils";
 import { mountInlineTrigger } from "./components/InlineTrigger";
 import { tryFetchNativeSpotifyUiLyrics } from "./components/NativeScraper";
-import { readUiSettings, LS_CONTRIBUTOR_NICKNAME } from "./components/SettingsPanel";
+import { readUiSettings, LS_CONTRIBUTOR_NICKNAME, LS_UI_DEBUG, LS_UI_LINE_GAP } from "./components/SettingsPanel";
 import { createManualSyncController } from "./manualSync";
 
 const BACKEND_BASE_URL = "https://lyrify-api.aquashield.lol";
@@ -406,7 +406,6 @@ async function startExtension() {
                     } catch (e) { addDebug(`Backend error: ${e}`); }
                 })();
 
-                // LRCLIB (priority 50 synced, 10 plain)
                 const lrclibPromise = (async () => {
                     try {
                         const m = await fetchLyricsFromLrclib({
@@ -418,9 +417,7 @@ async function startExtension() {
                             if (m.synced) {
                                 tryApply(m, 50, "LRCLIB (Synced)");
                             } else {
-                                const shouldAutogen = s.autoGenerate && info.durationMs;
-                                const finalLines = shouldAutogen ? autoGenerateTimings(m.lines, info.durationMs!) : m.lines;
-                                tryApply({ ...m, trackKey, lines: finalLines, synced: !!shouldAutogen }, 10, `LRCLIB (Plain${shouldAutogen ? " + AutoGen" : ""})`);
+                                tryApply({ ...m, trackKey, synced: false }, 10, "LRCLIB (Plain)");
                             }
                         }
                     } catch (e) { addDebug(`LRCLIB error: ${e}`); }
@@ -435,9 +432,7 @@ async function startExtension() {
                             if (m.synced) {
                                 tryApply(m, 50, "Spotify API (Synced)");
                             } else {
-                                const shouldAutogen = s.autoGenerate && info.durationMs;
-                                const finalLines = shouldAutogen ? autoGenerateTimings(m.lines, info.durationMs!) : m.lines;
-                                tryApply({ ...m, lines: finalLines, synced: !!shouldAutogen }, 10, `Spotify API (Plain${shouldAutogen ? " + AutoGen" : ""})`);
+                                tryApply({ ...m, synced: false }, 10, "Spotify API (Plain)");
                             }
                         }
                     } catch (e) { addDebug(`Spotify error: ${e}`); }

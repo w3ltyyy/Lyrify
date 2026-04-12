@@ -84,7 +84,7 @@ To synchronize a song manually:
 Lyrify allows deep customization through its settings panel:
 - **General**: Text size (22px-52px), Background blur, Brightness.
 - **Appearance**: Line spacing, Column width, Inactive line dimming.
-- **Sync**: Auto-generation of timings, Recording Mode toggle.
+- **Sync**: Recording Mode toggle.
 
 ---
 

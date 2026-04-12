@@ -7,7 +7,7 @@ export type Settings = {
   autoScroll: boolean;
   showDebug: boolean;
   fullscreen: boolean;
-  autoGenerate: boolean;
+  fullscreen: boolean;
   lineGapPx: number;
   maxWidthPx: number;
   inactiveOpacityPct: number;
@@ -24,7 +24,6 @@ export const LS_KEYS = {
   AUTO: "lyrify_ui_auto_scroll",
   DEBUG: "lyrify_ui_show_debug",
   FULLSCREEN: "lyrify_ui_fullscreen",
-  AUTOGEN: "lyrify_ui_autogen_sync",
   LINE_GAP: "lyrify_ui_line_gap",
   MAX_W: "lyrify_ui_max_width",
   INACTIVE_OP: "lyrify_ui_inactive_op_pct",
@@ -45,7 +44,7 @@ export const DEFAULT_SETTINGS: Settings = {
   autoScroll: true,
   showDebug: false,
   fullscreen: true,
-  autoGenerate: true,
+  fullscreen: true,
   lineGapPx: 14,
   maxWidthPx: 720,
   inactiveOpacityPct: 38,
@@ -74,7 +73,7 @@ class StateManager {
         autoScroll: localStorage.getItem(LS_KEYS.AUTO) !== "0",
         showDebug: localStorage.getItem(LS_KEYS.DEBUG) === "1",
         fullscreen: localStorage.getItem(LS_KEYS.FULLSCREEN) !== "0",
-        autoGenerate: localStorage.getItem(LS_KEYS.AUTOGEN) !== "0",
+        fullscreen: localStorage.getItem(LS_KEYS.FULLSCREEN) !== "0",
         lineGapPx: Math.min(28, Math.max(8, Number(localStorage.getItem(LS_KEYS.LINE_GAP) || "14") || 14)),
         maxWidthPx: Math.min(960, Math.max(480, Number(localStorage.getItem(LS_KEYS.MAX_W) || "720") || 720)),
         inactiveOpacityPct: Math.min(55, Math.max(15, Number(localStorage.getItem(LS_KEYS.INACTIVE_OP) || "38") || 38)),
@@ -97,7 +96,6 @@ class StateManager {
       if (newSettings.autoScroll !== undefined) localStorage.setItem(LS_KEYS.AUTO, newSettings.autoScroll ? "1" : "0");
       if (newSettings.showDebug !== undefined) localStorage.setItem(LS_KEYS.DEBUG, newSettings.showDebug ? "1" : "0");
       if (newSettings.fullscreen !== undefined) localStorage.setItem(LS_KEYS.FULLSCREEN, newSettings.fullscreen ? "1" : "0");
-      if (newSettings.autoGenerate !== undefined) localStorage.setItem(LS_KEYS.AUTOGEN, newSettings.autoGenerate ? "1" : "0");
       if (newSettings.lineGapPx !== undefined) localStorage.setItem(LS_KEYS.LINE_GAP, String(newSettings.lineGapPx));
       if (newSettings.maxWidthPx !== undefined) localStorage.setItem(LS_KEYS.MAX_W, String(newSettings.maxWidthPx));
       if (newSettings.inactiveOpacityPct !== undefined) localStorage.setItem(LS_KEYS.INACTIVE_OP, String(newSettings.inactiveOpacityPct));

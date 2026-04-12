@@ -8,7 +8,6 @@
     AUTO: "lyrify_ui_auto_scroll",
     DEBUG: "lyrify_ui_show_debug",
     FULLSCREEN: "lyrify_ui_fullscreen",
-    AUTOGEN: "lyrify_ui_autogen_sync",
     LINE_GAP: "lyrify_ui_line_gap",
     MAX_W: "lyrify_ui_max_width",
     INACTIVE_OP: "lyrify_ui_inactive_op_pct",
@@ -28,7 +27,7 @@
     autoScroll: true,
     showDebug: false,
     fullscreen: true,
-    autoGenerate: true,
+    fullscreen: true,
     lineGapPx: 14,
     maxWidthPx: 720,
     inactiveOpacityPct: 38,
@@ -54,7 +53,7 @@
           autoScroll: localStorage.getItem(LS_KEYS.AUTO) !== "0",
           showDebug: localStorage.getItem(LS_KEYS.DEBUG) === "1",
           fullscreen: localStorage.getItem(LS_KEYS.FULLSCREEN) !== "0",
-          autoGenerate: localStorage.getItem(LS_KEYS.AUTOGEN) !== "0",
+          fullscreen: localStorage.getItem(LS_KEYS.FULLSCREEN) !== "0",
           lineGapPx: Math.min(28, Math.max(8, Number(localStorage.getItem(LS_KEYS.LINE_GAP) || "14") || 14)),
           maxWidthPx: Math.min(960, Math.max(480, Number(localStorage.getItem(LS_KEYS.MAX_W) || "720") || 720)),
           inactiveOpacityPct: Math.min(55, Math.max(15, Number(localStorage.getItem(LS_KEYS.INACTIVE_OP) || "38") || 38)),
@@ -76,7 +75,6 @@
         if (newSettings.autoScroll !== void 0) localStorage.setItem(LS_KEYS.AUTO, newSettings.autoScroll ? "1" : "0");
         if (newSettings.showDebug !== void 0) localStorage.setItem(LS_KEYS.DEBUG, newSettings.showDebug ? "1" : "0");
         if (newSettings.fullscreen !== void 0) localStorage.setItem(LS_KEYS.FULLSCREEN, newSettings.fullscreen ? "1" : "0");
-        if (newSettings.autoGenerate !== void 0) localStorage.setItem(LS_KEYS.AUTOGEN, newSettings.autoGenerate ? "1" : "0");
         if (newSettings.lineGapPx !== void 0) localStorage.setItem(LS_KEYS.LINE_GAP, String(newSettings.lineGapPx));
         if (newSettings.maxWidthPx !== void 0) localStorage.setItem(LS_KEYS.MAX_W, String(newSettings.maxWidthPx));
         if (newSettings.inactiveOpacityPct !== void 0) localStorage.setItem(LS_KEYS.INACTIVE_OP, String(newSettings.inactiveOpacityPct));
@@ -1491,7 +1489,6 @@
   var LS_UI_BRIGHT = "lyrify_ui_brightness";
   var LS_UI_AUTO = "lyrify_ui_auto_scroll";
   var LS_UI_DEBUG = "lyrify_ui_show_debug";
-  var LS_UI_AUTOGEN = "lyrify_ui_autogen_sync";
   var LS_UI_LINE_GAP = "lyrify_ui_line_gap";
   var LS_UI_MAX_W = "lyrify_ui_max_width";
   var LS_UI_INACTIVE_OP = "lyrify_ui_inactive_op_pct";
@@ -1506,7 +1503,7 @@
       brightness: Math.min(1.35, Math.max(0.75, Number(localStorage.getItem(LS_UI_BRIGHT) || "1") || 1)),
       autoScroll: localStorage.getItem(LS_UI_AUTO) !== "0",
       showDebug: localStorage.getItem(LS_UI_DEBUG) === "1",
-      autoGenerate: localStorage.getItem(LS_UI_AUTOGEN) !== "0",
+      showDebug: localStorage.getItem(LS_UI_DEBUG) === "1",
       lineGapPx: Math.min(28, Math.max(8, Number(localStorage.getItem(LS_UI_LINE_GAP) || "14") || 14)),
       maxWidthPx: Math.min(960, Math.max(480, Number(localStorage.getItem(LS_UI_MAX_W) || "720") || 720)),
       inactiveOpacityPct: Math.min(55, Math.max(15, Number(localStorage.getItem(LS_UI_INACTIVE_OP) || "38") || 38)),
@@ -1550,7 +1547,6 @@
     const brightVal = h("span", { className: "lyrify-setting-val" });
     const autoScrollCb = h("input", { type: "checkbox" });
     const showDebugCb = h("input", { type: "checkbox" });
-    const autogenCb = h("input", { type: "checkbox" });
     const edgeFadeCb = h("input", { type: "checkbox" });
     const vibrantCb = h("input", { type: "checkbox" });
     const recordCb = h("input", { type: "checkbox" });
@@ -1576,7 +1572,6 @@
     appearanceSection.appendChild(row("Vibrant backgrounds", vibrantCb, h("span")));
     appearanceSection.appendChild(row("Highlight active line", highlightActiveCb, h("span")));
     syncSection.appendChild(h("div", { className: "lyrify-settings-subtitle" }, "Sync engine"));
-    syncSection.appendChild(row("Auto-generate", autogenCb, h("span")));
     if (manualSync) {
       syncSection.appendChild(row("Recording Mode", recordCb, h("span")));
     }
@@ -1604,7 +1599,6 @@
       brightVal.textContent = `${Math.round(s.brightness * 100)}%`;
       autoScrollCb.checked = s.autoScroll;
       showDebugCb.checked = s.showDebug;
-      autogenCb.checked = s.autoGenerate;
       edgeFadeCb.checked = s.edgeFade;
       lineGapRange.value = String(s.lineGapPx);
       lineGapVal.textContent = `${s.lineGapPx}px`;
@@ -1639,7 +1633,6 @@
         brightness: Number(brightRange.value) / 100,
         autoScroll: autoScrollCb.checked,
         showDebug: showDebugCb.checked,
-        autoGenerate: autogenCb.checked,
         edgeFade: edgeFadeCb.checked,
         lineGapPx: Number(lineGapRange.value),
         maxWidthPx: Number(maxWidthRange.value),
@@ -1653,7 +1646,7 @@
       if (onLayoutChange) setTimeout(() => onLayoutChange(false), 500);
     };
     [fontRange, blurRange, brightRange, lineGapRange, maxWidthRange, inactiveOpRange].forEach((input) => input.oninput = persist);
-    [autoScrollCb, showDebugCb, autogenCb, edgeFadeCb, vibrantCb, highlightActiveCb].forEach((cb) => cb.onchange = persist);
+    [autoScrollCb, showDebugCb, edgeFadeCb, vibrantCb, highlightActiveCb].forEach((cb) => cb.onchange = persist);
     nicknameInput.oninput = persist;
     recordCb.onchange = () => {
       if (manualSync) {
@@ -2601,51 +2594,6 @@
       }
     }
     return idx;
-  }
-  function autoGenerateTimings(lines, durationMs) {
-    const n = lines.length;
-    if (!Number.isFinite(durationMs) || durationMs <= 0 || n <= 1) return lines;
-    const hasAnyTimed = lines.some((l) => typeof l.startTime === "number");
-    if (hasAnyTimed) return lines;
-    const minLineMs = 1400;
-    const maxLineMs = 6800;
-    const sectionPauseMs = 1400;
-    const punctPauseMs = 400;
-    const endPadMs = 900;
-    const clean = (t2) => (t2 != null ? t2 : "").replace(/\s+/g, " ").trim();
-    const isSectionBreak = (t2) => clean(t2).length === 0;
-    const lenScore = (t2) => {
-      var _a2, _b, _c;
-      const s = clean(t2);
-      if (!s) return 0;
-      const alpha = ((_a2 = s.match(/[A-Za-zА-Яа-я0-9]/g)) != null ? _a2 : []).length;
-      const extra = ((_b = s.match(/[—–-]/g)) != null ? _b : []).length * 0.8 + ((_c = s.match(/[.,!?…:;]/g)) != null ? _c : []).length * 0.6;
-      return Math.max(1, alpha + extra);
-    };
-    const hasPunctEnd = (t2) => /[.!?…]$/.test(clean(t2));
-    const scores = lines.map((l) => lenScore(l.text));
-    const totalScore = scores.reduce((a, b) => a + b, 0) || 1;
-    const plannedPauses = lines.reduce((sum, l, i) => {
-      var _a2, _b;
-      if (i === 0) return sum;
-      if (isSectionBreak(l.text)) return sum + sectionPauseMs;
-      if (hasPunctEnd((_b = (_a2 = lines[i - 1]) == null ? void 0 : _a2.text) != null ? _b : "")) return sum + punctPauseMs;
-      return sum;
-    }, 0);
-    const usable = Math.max(3e3, durationMs - endPadMs - plannedPauses);
-    let t = 0;
-    return lines.map((l, i) => {
-      var _a2, _b;
-      if (i > 0) {
-        if (isSectionBreak(l.text)) t += sectionPauseMs;
-        else if (hasPunctEnd((_b = (_a2 = lines[i - 1]) == null ? void 0 : _a2.text) != null ? _b : "")) t += punctPauseMs;
-      }
-      const raw = usable * (scores[i] / totalScore) | 0;
-      const dur = isSectionBreak(l.text) ? Math.min(900, minLineMs) : Math.min(maxLineMs, Math.max(minLineMs, raw));
-      const start = Math.min(t, Math.max(0, durationMs - 500));
-      t += dur;
-      return { ...l, startTime: start };
-    });
   }
   function parseSyncedLyricsLrc(lrc) {
     const result = [];
@@ -3603,9 +3551,7 @@ Lines: ${model.lines.length}`);
                 if (m.synced) {
                   tryApply(m, 50, "LRCLIB (Synced)");
                 } else {
-                  const shouldAutogen = s.autoGenerate && info.durationMs;
-                  const finalLines = shouldAutogen ? autoGenerateTimings(m.lines, info.durationMs) : m.lines;
-                  tryApply({ ...m, trackKey, lines: finalLines, synced: !!shouldAutogen }, 10, `LRCLIB (Plain${shouldAutogen ? " + AutoGen" : ""})`);
+                  tryApply({ ...m, trackKey, synced: false }, 10, "LRCLIB (Plain)");
                 }
               }
             } catch (e) {
@@ -3620,9 +3566,7 @@ Lines: ${model.lines.length}`);
                 if (m.synced) {
                   tryApply(m, 50, "Spotify API (Synced)");
                 } else {
-                  const shouldAutogen = s.autoGenerate && info.durationMs;
-                  const finalLines = shouldAutogen ? autoGenerateTimings(m.lines, info.durationMs) : m.lines;
-                  tryApply({ ...m, lines: finalLines, synced: !!shouldAutogen }, 10, `Spotify API (Plain${shouldAutogen ? " + AutoGen" : ""})`);
+                  tryApply({ ...m, synced: false }, 10, "Spotify API (Plain)");
                 }
               }
             } catch (e) {
