@@ -1,5 +1,6 @@
 import { h } from "../domUtils";
 import { ManualSyncController } from "../manualSync";
+import { state, Settings } from "../state";
 
 export const LS_UI_FONT = "lyrify_ui_font_px";
 export const LS_UI_BLUR = "lyrify_ui_blur_px";
@@ -131,7 +132,7 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
   syncSection.appendChild(clearCacheBtn);
 
   const syncSettingsControls = (explicitTarget?: HTMLElement) => {
-    const s = readUiSettings();
+    const s = state.getSettings();
     (window as any).lyrify_settings = s;
     fontRange.value = String(s.fontPx);
     fontVal.textContent = String(s.fontPx);
@@ -143,8 +144,6 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
     showDebugCb.checked = s.showDebug;
     autogenCb.checked = s.autoGenerate;
     edgeFadeCb.checked = s.edgeFade;
-    vibrantCb.checked = s.vibrant;
-    highlightActiveCb.checked = s.highlightActive;
     lineGapRange.value = String(s.lineGapPx);
     lineGapVal.textContent = `${s.lineGapPx}px`;
     maxWidthRange.value = String(s.maxWidthPx);
@@ -162,8 +161,6 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
         target.style.setProperty("--lyrify-lines-gap", `${s.lineGapPx}px`);
         target.style.setProperty("--lyrify-lines-max-width", `${s.maxWidthPx}px`);
         target.style.setProperty("--lyrify-line-dim-opacity", String(s.inactiveOpacityPct / 100));
-        target.classList.toggle("s-vibrant-enabled", s.vibrant);
-        target.classList.toggle("s-highlight-enabled", s.highlightActive);
         
         const scrollWrap = target.querySelector("#lyrify-scroll-wrap") || document.getElementById("lyrify-scroll-wrap");
         if (scrollWrap instanceof HTMLElement) scrollWrap.classList.toggle("s-fade-disabled", !s.edgeFade);
@@ -174,21 +171,20 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
   };
 
   const persist = () => {
-    localStorage.setItem(LS_UI_FONT, fontRange.value);
-    localStorage.setItem(LS_UI_BLUR, blurRange.value);
-    localStorage.setItem(LS_UI_BRIGHT, String(Number(brightRange.value) / 100));
-    localStorage.setItem(LS_UI_AUTO, autoScrollCb.checked ? "1" : "0");
-    localStorage.setItem(LS_UI_DEBUG, showDebugCb.checked ? "1" : "0");
-    localStorage.setItem(LS_UI_AUTOGEN, autogenCb.checked ? "1" : "0");
-    localStorage.setItem(LS_UI_EDGE_FADE, edgeFadeCb.checked ? "1" : "0");
-    localStorage.setItem(LS_UI_VIBRANT, vibrantCb.checked ? "1" : "0");
-    localStorage.setItem(LS_UI_HIGHLIGHT_ACTIVE, highlightActiveCb.checked ? "1" : "0");
-    localStorage.setItem(LS_UI_LINE_GAP, lineGapRange.value);
-    localStorage.setItem(LS_UI_MAX_W, maxWidthRange.value);
-    localStorage.setItem(LS_UI_INACTIVE_OP, inactiveOpRange.value);
-    localStorage.setItem(LS_CONTRIBUTOR_NICKNAME, nicknameInput.value.trim());
+    state.saveSettings({
+        fontPx: Number(fontRange.value),
+        blurPx: Number(blurRange.value),
+        brightness: Number(brightRange.value) / 100,
+        autoScroll: autoScrollCb.checked,
+        showDebug: showDebugCb.checked,
+        autoGenerate: autogenCb.checked,
+        edgeFade: edgeFadeCb.checked,
+        lineGapPx: Number(lineGapRange.value),
+        maxWidthPx: Number(maxWidthRange.value),
+        inactiveOpacityPct: Number(inactiveOpRange.value),
+        nickname: nicknameInput.value.trim()
+    });
     
-    (window as any).lyrify_settings = readUiSettings();
     if (onLayoutChange) onLayoutChange(true);
     syncSettingsControls();
     if (onLayoutChange) setTimeout(() => onLayoutChange(false), 500);

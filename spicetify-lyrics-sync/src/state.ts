@@ -12,6 +12,7 @@ export type Settings = {
   maxWidthPx: number;
   inactiveOpacityPct: number;
   edgeFade: boolean;
+  nickname: string;
 };
 
 export const LS_KEYS = {
@@ -44,7 +45,8 @@ export const DEFAULT_SETTINGS: Settings = {
   lineGapPx: 14,
   maxWidthPx: 720,
   inactiveOpacityPct: 38,
-  edgeFade: true
+  edgeFade: true,
+  nickname: ""
 };
 
 class StateManager {
@@ -70,7 +72,8 @@ class StateManager {
         lineGapPx: Math.min(28, Math.max(8, Number(localStorage.getItem(LS_KEYS.LINE_GAP) || "14") || 14)),
         maxWidthPx: Math.min(960, Math.max(480, Number(localStorage.getItem(LS_KEYS.MAX_W) || "720") || 720)),
         inactiveOpacityPct: Math.min(55, Math.max(15, Number(localStorage.getItem(LS_KEYS.INACTIVE_OP) || "38") || 38)),
-        edgeFade: localStorage.getItem(LS_KEYS.EDGE_FADE) !== "0"
+        edgeFade: localStorage.getItem(LS_KEYS.EDGE_FADE) !== "0",
+        nickname: localStorage.getItem("lyrify_contributor_nickname") || "" 
       };
     } catch {
       this.settings = { ...DEFAULT_SETTINGS };
@@ -91,6 +94,7 @@ class StateManager {
       if (newSettings.maxWidthPx !== undefined) localStorage.setItem(LS_KEYS.MAX_W, String(newSettings.maxWidthPx));
       if (newSettings.inactiveOpacityPct !== undefined) localStorage.setItem(LS_KEYS.INACTIVE_OP, String(newSettings.inactiveOpacityPct));
       if (newSettings.edgeFade !== undefined) localStorage.setItem(LS_KEYS.EDGE_FADE, newSettings.edgeFade ? "1" : "0");
+      if (newSettings.nickname !== undefined) localStorage.setItem("lyrify_contributor_nickname", newSettings.nickname);
     } catch {
       // ignore
     }

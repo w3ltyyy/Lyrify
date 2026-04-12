@@ -815,13 +815,42 @@ export const STYLES = `
       min-width: 120px;
       max-width: 220px;
     }
-    .lyrify-setting-val {
-      width: 40px;
-      text-align: right;
-      opacity: 0.75;
-      font-variant-numeric: tabular-nums;
-    }
     .lyrify-setting-row input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      margin: 0;
+      cursor: pointer;
+    }
+    .lyrify-setting-text {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 11px;
+      padding: 5px 8px;
+      outline: none;
+      transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+      width: 120px;
+      text-align: right;
+    }
+    .lyrify-setting-text:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .lyrify-setting-text:focus {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--lyrify-accent-strong, #1db954);
+      box-shadow: 0 0 0 3px rgba(30, 215, 96, 0.12);
+      width: 140px;
+    }
+    .lyrify-setting-val {
+      min-width: 32px;
+      text-align: right;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      opacity: 0.9;
+    }.lyrify-setting-row input[type="checkbox"] {
       transform: translateY(1px);
     }
     #lyrify-scroll-wrap {

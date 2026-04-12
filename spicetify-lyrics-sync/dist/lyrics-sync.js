@@ -30,7 +30,8 @@
     lineGapPx: 14,
     maxWidthPx: 720,
     inactiveOpacityPct: 38,
-    edgeFade: true
+    edgeFade: true,
+    nickname: ""
   };
   var StateManager = class {
     constructor() {
@@ -53,7 +54,8 @@
           lineGapPx: Math.min(28, Math.max(8, Number(localStorage.getItem(LS_KEYS.LINE_GAP) || "14") || 14)),
           maxWidthPx: Math.min(960, Math.max(480, Number(localStorage.getItem(LS_KEYS.MAX_W) || "720") || 720)),
           inactiveOpacityPct: Math.min(55, Math.max(15, Number(localStorage.getItem(LS_KEYS.INACTIVE_OP) || "38") || 38)),
-          edgeFade: localStorage.getItem(LS_KEYS.EDGE_FADE) !== "0"
+          edgeFade: localStorage.getItem(LS_KEYS.EDGE_FADE) !== "0",
+          nickname: localStorage.getItem("lyrify_contributor_nickname") || ""
         };
       } catch (e) {
         this.settings = { ...DEFAULT_SETTINGS };
@@ -73,6 +75,7 @@
         if (newSettings.maxWidthPx !== void 0) localStorage.setItem(LS_KEYS.MAX_W, String(newSettings.maxWidthPx));
         if (newSettings.inactiveOpacityPct !== void 0) localStorage.setItem(LS_KEYS.INACTIVE_OP, String(newSettings.inactiveOpacityPct));
         if (newSettings.edgeFade !== void 0) localStorage.setItem(LS_KEYS.EDGE_FADE, newSettings.edgeFade ? "1" : "0");
+        if (newSettings.nickname !== void 0) localStorage.setItem("lyrify_contributor_nickname", newSettings.nickname);
       } catch (e) {
       }
       this.notify();
@@ -922,13 +925,42 @@
       min-width: 120px;
       max-width: 220px;
     }
-    .lyrify-setting-val {
-      width: 40px;
-      text-align: right;
-      opacity: 0.75;
-      font-variant-numeric: tabular-nums;
-    }
     .lyrify-setting-row input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      margin: 0;
+      cursor: pointer;
+    }
+    .lyrify-setting-text {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 11px;
+      padding: 5px 8px;
+      outline: none;
+      transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+      width: 120px;
+      text-align: right;
+    }
+    .lyrify-setting-text:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .lyrify-setting-text:focus {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--lyrify-accent-strong, #1db954);
+      box-shadow: 0 0 0 3px rgba(30, 215, 96, 0.12);
+      width: 140px;
+    }
+    .lyrify-setting-val {
+      min-width: 32px;
+      text-align: right;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      opacity: 0.9;
+    }.lyrify-setting-row input[type="checkbox"] {
       transform: translateY(1px);
     }
     #lyrify-scroll-wrap {
@@ -1431,6 +1463,13 @@
     }
     return id;
   }
+  function generateRandomNickname() {
+    const adj = ["Shiny", "Golden", "Swift", "Quiet", "Bold", "Lively", "Wild", "Frosty", "Misty", "Vibrant", "Kind", "Cool", "Epic", "Magic", "Solar", "Lunar", "Super", "Elite", "Grand", "Cosmic"];
+    const nouns = ["Panda", "Fox", "Eagle", "Wolf", "Tiger", "Bear", "Owl", "Deer", "Lynx", "Falcon", "Koala", "Otter", "Lion", "Shark", "Raven", "Dolphin", "Phoenix", "Leopard", "Cobra", "Dragon"];
+    const a = adj[Math.floor(Math.random() * adj.length)];
+    const n = nouns[Math.floor(Math.random() * nouns.length)];
+    return `${a} ${n}`;
+  }
 
   // src/components/SettingsPanel.ts
   var LS_UI_FONT = "lyrify_ui_font_px";
@@ -1541,7 +1580,7 @@
     };
     syncSection.appendChild(clearCacheBtn);
     const syncSettingsControls = (explicitTarget) => {
-      const s = readUiSettings();
+      const s = state.getSettings();
       window.lyrify_settings = s;
       fontRange.value = String(s.fontPx);
       fontVal.textContent = String(s.fontPx);
@@ -1553,8 +1592,6 @@
       showDebugCb.checked = s.showDebug;
       autogenCb.checked = s.autoGenerate;
       edgeFadeCb.checked = s.edgeFade;
-      vibrantCb.checked = s.vibrant;
-      highlightActiveCb.checked = s.highlightActive;
       lineGapRange.value = String(s.lineGapPx);
       lineGapVal.textContent = `${s.lineGapPx}px`;
       maxWidthRange.value = String(s.maxWidthPx);
@@ -1571,8 +1608,6 @@
         target.style.setProperty("--lyrify-lines-gap", `${s.lineGapPx}px`);
         target.style.setProperty("--lyrify-lines-max-width", `${s.maxWidthPx}px`);
         target.style.setProperty("--lyrify-line-dim-opacity", String(s.inactiveOpacityPct / 100));
-        target.classList.toggle("s-vibrant-enabled", s.vibrant);
-        target.classList.toggle("s-highlight-enabled", s.highlightActive);
         const scrollWrap = target.querySelector("#lyrify-scroll-wrap") || document.getElementById("lyrify-scroll-wrap");
         if (scrollWrap instanceof HTMLElement) scrollWrap.classList.toggle("s-fade-disabled", !s.edgeFade);
         const debugEl = target.querySelector("#lyrify-debug-info") || document.getElementById("lyrify-debug-info");
@@ -1580,20 +1615,19 @@
       }
     };
     const persist = () => {
-      localStorage.setItem(LS_UI_FONT, fontRange.value);
-      localStorage.setItem(LS_UI_BLUR, blurRange.value);
-      localStorage.setItem(LS_UI_BRIGHT, String(Number(brightRange.value) / 100));
-      localStorage.setItem(LS_UI_AUTO, autoScrollCb.checked ? "1" : "0");
-      localStorage.setItem(LS_UI_DEBUG, showDebugCb.checked ? "1" : "0");
-      localStorage.setItem(LS_UI_AUTOGEN, autogenCb.checked ? "1" : "0");
-      localStorage.setItem(LS_UI_EDGE_FADE, edgeFadeCb.checked ? "1" : "0");
-      localStorage.setItem(LS_UI_VIBRANT, vibrantCb.checked ? "1" : "0");
-      localStorage.setItem(LS_UI_HIGHLIGHT_ACTIVE, highlightActiveCb.checked ? "1" : "0");
-      localStorage.setItem(LS_UI_LINE_GAP, lineGapRange.value);
-      localStorage.setItem(LS_UI_MAX_W, maxWidthRange.value);
-      localStorage.setItem(LS_UI_INACTIVE_OP, inactiveOpRange.value);
-      localStorage.setItem(LS_CONTRIBUTOR_NICKNAME, nicknameInput.value.trim());
-      window.lyrify_settings = readUiSettings();
+      state.saveSettings({
+        fontPx: Number(fontRange.value),
+        blurPx: Number(blurRange.value),
+        brightness: Number(brightRange.value) / 100,
+        autoScroll: autoScrollCb.checked,
+        showDebug: showDebugCb.checked,
+        autoGenerate: autogenCb.checked,
+        edgeFade: edgeFadeCb.checked,
+        lineGapPx: Number(lineGapRange.value),
+        maxWidthPx: Number(maxWidthRange.value),
+        inactiveOpacityPct: Number(inactiveOpRange.value),
+        nickname: nicknameInput.value.trim()
+      });
       if (onLayoutChange) onLayoutChange(true);
       syncSettingsControls();
       if (onLayoutChange) setTimeout(() => onLayoutChange(false), 500);
@@ -2416,11 +2450,11 @@
 
   // src/playerObserver.ts
   function createPlayerObserver(onTrackChange) {
-    const w = window;
+    const w2 = window;
     const getTrackInfo = () => {
       var _a2, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _E, _F, _G, _H, _I, _J, _K, _L, _M, _N, _O, _P, _Q, _R, _S;
-      const ps = (_b = (_a2 = w.Spicetify) == null ? void 0 : _a2.Player) == null ? void 0 : _b.data;
-      const queue = (_g = (_c = w.Spicetify) == null ? void 0 : _c.Queue) != null ? _g : (_f = (_e = (_d = w.Spicetify) == null ? void 0 : _d.Platform) == null ? void 0 : _e.PlayerAPI) == null ? void 0 : _f._queue;
+      const ps = (_b = (_a2 = w2.Spicetify) == null ? void 0 : _a2.Player) == null ? void 0 : _b.data;
+      const queue = (_g = (_c = w2.Spicetify) == null ? void 0 : _c.Queue) != null ? _g : (_f = (_e = (_d = w2.Spicetify) == null ? void 0 : _d.Platform) == null ? void 0 : _e.PlayerAPI) == null ? void 0 : _f._queue;
       const queueTrack = (_k = (_i = queue == null ? void 0 : queue.item) != null ? _i : (_h = queue == null ? void 0 : queue.queued) == null ? void 0 : _h[0]) != null ? _k : (_j = queue == null ? void 0 : queue.nextTracks) == null ? void 0 : _j[0];
       const mdCandidates = [
         (_l = ps == null ? void 0 : ps.track) == null ? void 0 : _l.metadata,
@@ -2497,7 +2531,7 @@
     const isAdPlaying = () => {
       var _a2, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
       try {
-        const ps = (_b = (_a2 = w.Spicetify) == null ? void 0 : _a2.Player) == null ? void 0 : _b.data;
+        const ps = (_b = (_a2 = w2.Spicetify) == null ? void 0 : _a2.Player) == null ? void 0 : _b.data;
         const md = (_g = (_f = (_e = (_c = ps == null ? void 0 : ps.track) == null ? void 0 : _c.metadata) != null ? _e : (_d = ps == null ? void 0 : ps.item) == null ? void 0 : _d.metadata) != null ? _f : ps == null ? void 0 : ps.item) != null ? _g : {};
         const uri = String((_j = (_i = md == null ? void 0 : md.uri) != null ? _i : (_h = ps == null ? void 0 : ps.item) == null ? void 0 : _h.uri) != null ? _j : "").toLowerCase();
         const type = String((_n = (_m = (_k = md == null ? void 0 : md.media_type) != null ? _k : md == null ? void 0 : md.type) != null ? _m : (_l = ps == null ? void 0 : ps.item) == null ? void 0 : _l.type) != null ? _n : "").toLowerCase();
@@ -2519,12 +2553,12 @@
       var _a2, _b;
       onTrackChange((_b = (_a2 = event == null ? void 0 : event.data) == null ? void 0 : _a2.track) == null ? void 0 : _b.uri);
     };
-    w.Spicetify.Player.addEventListener("songchange", listener);
+    w2.Spicetify.Player.addEventListener("songchange", listener);
     return {
       getTrackInfo,
       isAdPlaying,
       destroy: () => {
-        w.Spicetify.Player.removeEventListener("songchange", listener);
+        w2.Spicetify.Player.removeEventListener("songchange", listener);
       }
     };
   }
@@ -3264,7 +3298,12 @@
     if (isStarted) return;
     isStarted = true;
     try {
-      const w = window;
+      const currentSettings = state.getSettings();
+      if (!currentSettings.nickname) {
+        const randomNick = generateRandomNickname();
+        state.saveSettings({ nickname: randomNick });
+      }
+      const authorId = getOrCreateAuthorId();
       let isScrubbingNative = false;
       if (!document.getElementById(CSS_ID)) {
         const style = document.createElement("style");
@@ -3361,13 +3400,13 @@
           });
         },
         onSubmit: async (key, lines, authorIdInput) => {
-          const s = readUiSettings();
-          const authorId = getOrCreateAuthorId();
+          const s = state.getSettings();
+          const authorId2 = getOrCreateAuthorId();
           const authorNickname = s.nickname || void 0;
           const res = await fetch(`${BACKEND_BASE_URL}/submission`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ trackKey: key, lines, authorId, authorNickname })
+            body: JSON.stringify({ trackKey: key, lines, authorId: authorId2, authorNickname })
           });
           return res.json();
         },

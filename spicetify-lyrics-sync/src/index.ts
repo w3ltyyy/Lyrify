@@ -112,7 +112,13 @@ async function startExtension() {
     isStarted = true;
 
     try {
-        const w = window as any;
+        const currentSettings = state.getSettings();
+        if (!currentSettings.nickname) {
+            const randomNick = generateRandomNickname();
+            state.saveSettings({ nickname: randomNick });
+        }
+
+        const authorId = getOrCreateAuthorId();
     let isScrubbingNative = false;
 
         if (!document.getElementById(CSS_ID)) {
@@ -215,7 +221,7 @@ async function startExtension() {
                 });
             },
             onSubmit: async (key, lines, authorIdInput) => {
-                const s = readUiSettings();
+                const s = state.getSettings();
                 const authorId = getOrCreateAuthorId();
                 const authorNickname = s.nickname || undefined;
                 const res = await fetch(`${BACKEND_BASE_URL}/submission`, {
