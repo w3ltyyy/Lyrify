@@ -150,6 +150,8 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
     maxWidthVal.textContent = `${s.maxWidthPx}px`;
     inactiveOpRange.value = String(s.inactiveOpacityPct);
     inactiveOpVal.textContent = `${s.inactiveOpacityPct}%`;
+    vibrantCb.checked = s.vibrant;
+    highlightActiveCb.checked = s.highlightActive;
     nicknameInput.value = s.nickname;
     if (manualSync) recordCb.checked = manualSync.isRecording();
 
@@ -161,6 +163,8 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
         target.style.setProperty("--lyrify-lines-gap", `${s.lineGapPx}px`);
         target.style.setProperty("--lyrify-lines-max-width", `${s.maxWidthPx}px`);
         target.style.setProperty("--lyrify-line-dim-opacity", String(s.inactiveOpacityPct / 100));
+        target.classList.toggle("s-vibrant-enabled", s.vibrant);
+        target.classList.toggle("s-highlight-enabled", s.highlightActive);
         
         const scrollWrap = target.querySelector("#lyrify-scroll-wrap") || document.getElementById("lyrify-scroll-wrap");
         if (scrollWrap instanceof HTMLElement) scrollWrap.classList.toggle("s-fade-disabled", !s.edgeFade);
@@ -182,6 +186,8 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
         lineGapPx: Number(lineGapRange.value),
         maxWidthPx: Number(maxWidthRange.value),
         inactiveOpacityPct: Number(inactiveOpRange.value),
+        vibrant: vibrantCb.checked,
+        highlightActive: highlightActiveCb.checked,
         nickname: nicknameInput.value.trim()
     });
     

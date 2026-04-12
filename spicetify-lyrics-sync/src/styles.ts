@@ -805,10 +805,16 @@ export const STYLES = `
       align-items: center;
       gap: 12px;
       flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .lyrify-setting-row:last-child {
+      margin-bottom: 0;
     }
     .lyrify-setting-row label {
       min-width: 120px;
       opacity: 0.85;
+      font-weight: 500;
+      font-size: 12.5px;
     }
     .lyrify-setting-row input[type="range"] {
       flex: 1;
@@ -816,10 +822,11 @@ export const STYLES = `
       max-width: 220px;
     }
     .lyrify-setting-row input[type="checkbox"] {
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
       margin: 0;
       cursor: pointer;
+      transform: translateY(1px);
     }
     .lyrify-setting-text {
       background: rgba(255, 255, 255, 0.04);
@@ -845,13 +852,12 @@ export const STYLES = `
       width: 140px;
     }
     .lyrify-setting-val {
-      min-width: 32px;
+      min-width: 38px;
       text-align: right;
       font-weight: 700;
       font-variant-numeric: tabular-nums;
       opacity: 0.9;
-    }.lyrify-setting-row input[type="checkbox"] {
-      transform: translateY(1px);
+      font-size: 11px;
     }
     #lyrify-scroll-wrap {
       position: relative;

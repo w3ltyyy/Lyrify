@@ -17,7 +17,9 @@
     MINI_Y: "lyrify_mini_y",
     HUD_X: "lyrify_record_hud_x",
     HUD_Y: "lyrify_record_hud_y",
-    AUTHOR_ID: "lyrify_author_id"
+    AUTHOR_ID: "lyrify_author_id",
+    VIBRANT: "lyrify_ui_vibrant",
+    HIGHLIGHT_ACTIVE: "lyrify_ui_highlight_active"
   };
   var DEFAULT_SETTINGS = {
     fontPx: 35,
@@ -31,7 +33,9 @@
     maxWidthPx: 720,
     inactiveOpacityPct: 38,
     edgeFade: true,
-    nickname: ""
+    nickname: "",
+    vibrant: false,
+    highlightActive: true
   };
   var StateManager = class {
     constructor() {
@@ -55,7 +59,9 @@
           maxWidthPx: Math.min(960, Math.max(480, Number(localStorage.getItem(LS_KEYS.MAX_W) || "720") || 720)),
           inactiveOpacityPct: Math.min(55, Math.max(15, Number(localStorage.getItem(LS_KEYS.INACTIVE_OP) || "38") || 38)),
           edgeFade: localStorage.getItem(LS_KEYS.EDGE_FADE) !== "0",
-          nickname: localStorage.getItem("lyrify_contributor_nickname") || ""
+          nickname: localStorage.getItem("lyrify_contributor_nickname") || "",
+          vibrant: localStorage.getItem(LS_KEYS.VIBRANT) === "1",
+          highlightActive: localStorage.getItem(LS_KEYS.HIGHLIGHT_ACTIVE) !== "0"
         };
       } catch (e) {
         this.settings = { ...DEFAULT_SETTINGS };
@@ -76,6 +82,8 @@
         if (newSettings.inactiveOpacityPct !== void 0) localStorage.setItem(LS_KEYS.INACTIVE_OP, String(newSettings.inactiveOpacityPct));
         if (newSettings.edgeFade !== void 0) localStorage.setItem(LS_KEYS.EDGE_FADE, newSettings.edgeFade ? "1" : "0");
         if (newSettings.nickname !== void 0) localStorage.setItem("lyrify_contributor_nickname", newSettings.nickname);
+        if (newSettings.vibrant !== void 0) localStorage.setItem(LS_KEYS.VIBRANT, newSettings.vibrant ? "1" : "0");
+        if (newSettings.highlightActive !== void 0) localStorage.setItem(LS_KEYS.HIGHLIGHT_ACTIVE, newSettings.highlightActive ? "1" : "0");
       } catch (e) {
       }
       this.notify();
@@ -915,10 +923,16 @@
       align-items: center;
       gap: 12px;
       flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .lyrify-setting-row:last-child {
+      margin-bottom: 0;
     }
     .lyrify-setting-row label {
       min-width: 120px;
       opacity: 0.85;
+      font-weight: 500;
+      font-size: 12.5px;
     }
     .lyrify-setting-row input[type="range"] {
       flex: 1;
@@ -926,10 +940,11 @@
       max-width: 220px;
     }
     .lyrify-setting-row input[type="checkbox"] {
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
       margin: 0;
       cursor: pointer;
+      transform: translateY(1px);
     }
     .lyrify-setting-text {
       background: rgba(255, 255, 255, 0.04);
@@ -955,13 +970,12 @@
       width: 140px;
     }
     .lyrify-setting-val {
-      min-width: 32px;
+      min-width: 38px;
       text-align: right;
       font-weight: 700;
       font-variant-numeric: tabular-nums;
       opacity: 0.9;
-    }.lyrify-setting-row input[type="checkbox"] {
-      transform: translateY(1px);
+      font-size: 11px;
     }
     #lyrify-scroll-wrap {
       position: relative;
@@ -1598,6 +1612,8 @@
       maxWidthVal.textContent = `${s.maxWidthPx}px`;
       inactiveOpRange.value = String(s.inactiveOpacityPct);
       inactiveOpVal.textContent = `${s.inactiveOpacityPct}%`;
+      vibrantCb.checked = s.vibrant;
+      highlightActiveCb.checked = s.highlightActive;
       nicknameInput.value = s.nickname;
       if (manualSync) recordCb.checked = manualSync.isRecording();
       const target = explicitTarget || targetOverlay || document.getElementById("lyrify-overlay");
@@ -1608,6 +1624,8 @@
         target.style.setProperty("--lyrify-lines-gap", `${s.lineGapPx}px`);
         target.style.setProperty("--lyrify-lines-max-width", `${s.maxWidthPx}px`);
         target.style.setProperty("--lyrify-line-dim-opacity", String(s.inactiveOpacityPct / 100));
+        target.classList.toggle("s-vibrant-enabled", s.vibrant);
+        target.classList.toggle("s-highlight-enabled", s.highlightActive);
         const scrollWrap = target.querySelector("#lyrify-scroll-wrap") || document.getElementById("lyrify-scroll-wrap");
         if (scrollWrap instanceof HTMLElement) scrollWrap.classList.toggle("s-fade-disabled", !s.edgeFade);
         const debugEl = target.querySelector("#lyrify-debug-info") || document.getElementById("lyrify-debug-info");
@@ -1626,6 +1644,8 @@
         lineGapPx: Number(lineGapRange.value),
         maxWidthPx: Number(maxWidthRange.value),
         inactiveOpacityPct: Number(inactiveOpRange.value),
+        vibrant: vibrantCb.checked,
+        highlightActive: highlightActiveCb.checked,
         nickname: nicknameInput.value.trim()
       });
       if (onLayoutChange) onLayoutChange(true);
@@ -2450,11 +2470,11 @@
 
   // src/playerObserver.ts
   function createPlayerObserver(onTrackChange) {
-    const w2 = window;
+    const w = window;
     const getTrackInfo = () => {
       var _a2, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _E, _F, _G, _H, _I, _J, _K, _L, _M, _N, _O, _P, _Q, _R, _S;
-      const ps = (_b = (_a2 = w2.Spicetify) == null ? void 0 : _a2.Player) == null ? void 0 : _b.data;
-      const queue = (_g = (_c = w2.Spicetify) == null ? void 0 : _c.Queue) != null ? _g : (_f = (_e = (_d = w2.Spicetify) == null ? void 0 : _d.Platform) == null ? void 0 : _e.PlayerAPI) == null ? void 0 : _f._queue;
+      const ps = (_b = (_a2 = w.Spicetify) == null ? void 0 : _a2.Player) == null ? void 0 : _b.data;
+      const queue = (_g = (_c = w.Spicetify) == null ? void 0 : _c.Queue) != null ? _g : (_f = (_e = (_d = w.Spicetify) == null ? void 0 : _d.Platform) == null ? void 0 : _e.PlayerAPI) == null ? void 0 : _f._queue;
       const queueTrack = (_k = (_i = queue == null ? void 0 : queue.item) != null ? _i : (_h = queue == null ? void 0 : queue.queued) == null ? void 0 : _h[0]) != null ? _k : (_j = queue == null ? void 0 : queue.nextTracks) == null ? void 0 : _j[0];
       const mdCandidates = [
         (_l = ps == null ? void 0 : ps.track) == null ? void 0 : _l.metadata,
@@ -2531,7 +2551,7 @@
     const isAdPlaying = () => {
       var _a2, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
       try {
-        const ps = (_b = (_a2 = w2.Spicetify) == null ? void 0 : _a2.Player) == null ? void 0 : _b.data;
+        const ps = (_b = (_a2 = w.Spicetify) == null ? void 0 : _a2.Player) == null ? void 0 : _b.data;
         const md = (_g = (_f = (_e = (_c = ps == null ? void 0 : ps.track) == null ? void 0 : _c.metadata) != null ? _e : (_d = ps == null ? void 0 : ps.item) == null ? void 0 : _d.metadata) != null ? _f : ps == null ? void 0 : ps.item) != null ? _g : {};
         const uri = String((_j = (_i = md == null ? void 0 : md.uri) != null ? _i : (_h = ps == null ? void 0 : ps.item) == null ? void 0 : _h.uri) != null ? _j : "").toLowerCase();
         const type = String((_n = (_m = (_k = md == null ? void 0 : md.media_type) != null ? _k : md == null ? void 0 : md.type) != null ? _m : (_l = ps == null ? void 0 : ps.item) == null ? void 0 : _l.type) != null ? _n : "").toLowerCase();
@@ -2553,12 +2573,12 @@
       var _a2, _b;
       onTrackChange((_b = (_a2 = event == null ? void 0 : event.data) == null ? void 0 : _a2.track) == null ? void 0 : _b.uri);
     };
-    w2.Spicetify.Player.addEventListener("songchange", listener);
+    w.Spicetify.Player.addEventListener("songchange", listener);
     return {
       getTrackInfo,
       isAdPlaying,
       destroy: () => {
-        w2.Spicetify.Player.removeEventListener("songchange", listener);
+        w.Spicetify.Player.removeEventListener("songchange", listener);
       }
     };
   }
@@ -3298,6 +3318,7 @@
     if (isStarted) return;
     isStarted = true;
     try {
+      const w = window;
       const currentSettings = state.getSettings();
       if (!currentSettings.nickname) {
         const randomNick = generateRandomNickname();

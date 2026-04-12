@@ -112,6 +112,7 @@ async function startExtension() {
     isStarted = true;
 
     try {
+        const w = window as any;
         const currentSettings = state.getSettings();
         if (!currentSettings.nickname) {
             const randomNick = generateRandomNickname();

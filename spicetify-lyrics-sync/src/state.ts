@@ -13,6 +13,8 @@ export type Settings = {
   inactiveOpacityPct: number;
   edgeFade: boolean;
   nickname: string;
+  vibrant: boolean;
+  highlightActive: boolean;
 };
 
 export const LS_KEYS = {
@@ -31,7 +33,9 @@ export const LS_KEYS = {
   MINI_Y: "lyrify_mini_y",
   HUD_X: "lyrify_record_hud_x",
   HUD_Y: "lyrify_record_hud_y",
-  AUTHOR_ID: "lyrify_author_id"
+  AUTHOR_ID: "lyrify_author_id",
+  VIBRANT: "lyrify_ui_vibrant",
+  HIGHLIGHT_ACTIVE: "lyrify_ui_highlight_active"
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -46,7 +50,9 @@ export const DEFAULT_SETTINGS: Settings = {
   maxWidthPx: 720,
   inactiveOpacityPct: 38,
   edgeFade: true,
-  nickname: ""
+  nickname: "",
+  vibrant: false,
+  highlightActive: true
 };
 
 class StateManager {
@@ -73,7 +79,9 @@ class StateManager {
         maxWidthPx: Math.min(960, Math.max(480, Number(localStorage.getItem(LS_KEYS.MAX_W) || "720") || 720)),
         inactiveOpacityPct: Math.min(55, Math.max(15, Number(localStorage.getItem(LS_KEYS.INACTIVE_OP) || "38") || 38)),
         edgeFade: localStorage.getItem(LS_KEYS.EDGE_FADE) !== "0",
-        nickname: localStorage.getItem("lyrify_contributor_nickname") || "" 
+        nickname: localStorage.getItem("lyrify_contributor_nickname") || "",
+        vibrant: localStorage.getItem(LS_KEYS.VIBRANT) === "1",
+        highlightActive: localStorage.getItem(LS_KEYS.HIGHLIGHT_ACTIVE) !== "0"
       };
     } catch {
       this.settings = { ...DEFAULT_SETTINGS };
@@ -95,6 +103,8 @@ class StateManager {
       if (newSettings.inactiveOpacityPct !== undefined) localStorage.setItem(LS_KEYS.INACTIVE_OP, String(newSettings.inactiveOpacityPct));
       if (newSettings.edgeFade !== undefined) localStorage.setItem(LS_KEYS.EDGE_FADE, newSettings.edgeFade ? "1" : "0");
       if (newSettings.nickname !== undefined) localStorage.setItem("lyrify_contributor_nickname", newSettings.nickname);
+      if (newSettings.vibrant !== undefined) localStorage.setItem(LS_KEYS.VIBRANT, newSettings.vibrant ? "1" : "0");
+      if (newSettings.highlightActive !== undefined) localStorage.setItem(LS_KEYS.HIGHLIGHT_ACTIVE, newSettings.highlightActive ? "1" : "0");
     } catch {
       // ignore
     }
