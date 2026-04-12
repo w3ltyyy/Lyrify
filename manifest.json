@@ -1,6 +1,6 @@
 {
   "name": "Lyrify",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Lightning-fast synced lyrics for Spicetify using community-sourced data, LRCLIB, and native Spotify lyrics. Features a beautiful dynamic interface with recording tools.",
   "main": "lyrify.js",
   "preview": "assets/logo-v2.svg",

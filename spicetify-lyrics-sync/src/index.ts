@@ -108,7 +108,7 @@ let highlightTimer: number | null = null;
 let miniOpen = false;
 
 async function startExtension() {
-    console.info("[lyrify] Initializing v1.2.1");
+    console.info("[lyrify] Initializing v1.2.2");
     if (isStarted) return;
     isStarted = true;
 
