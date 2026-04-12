@@ -360,7 +360,7 @@
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.05);
       color: rgba(255, 255, 255, 0.8);
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       cursor: pointer;
@@ -368,10 +368,59 @@
       opacity: 0;
       transition: all 0.2s ease;
     }
+    #lyrify-overlay.s-split-view .lyrify-fs-exit-btn {
+      display: flex;
+    }
     #lyrify-overlay.s-split-view.s-mouse-active .lyrify-fs-exit-btn,
     .lyrify-fs-exit-btn:hover {
       opacity: 1 !important;
       pointer-events: auto;
+    }
+
+    /* Request Sync Button */
+    .lyrify-req-sync-btn {
+      position: relative;
+      margin-left: 14px;
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+    .lyrify-req-sync-btn.s-visible {
+      opacity: 1;
+      pointer-events: auto;
+      display: inline-flex;
+    }
+    .lyrify-req-sync-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+    .lyrify-req-sync-btn.s-success {
+      background: rgba(30, 215, 96, 0.4);
+      border-color: rgba(30, 215, 96, 0.8);
+      color: #fff;
+    }
+    .lyrify-req-sync-btn.s-fade-out {
+      opacity: 0;
+      transform: scale(0.9);
     }
     .lyrify-fs-exit-btn:hover {
       background: rgba(255, 255, 255, 0.2);
@@ -1713,7 +1762,7 @@
   }
 
   // src/components/Overlay.ts
-  var SVG_PREV = `<svg viewBox="0 0 16 16"><path d="M12.7 1a.7.7 0 0 0-.7.7v5.15L3.483 1.141a.7.7 0 0 0-1.083.593v12.532a.7.7 0 0 0 1.083.593L12 9.15V14.3a.7.7 0 0 0 .7.7h1.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-1.6z"/></svg>`;
+  var SVG_PREV = `<svg viewBox="0 0 16 16"><path d="M12.7 1a.7.7 0 0 0-.7.7v5.15L3.483 1.141a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm7.4 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z"/></svg>`;
   var SVG_NEXT = `<svg viewBox="0 0 16 16"><path d="M3.3 1a.7.7 0 0 1 .7.7v5.15l8.517-5.709a.7.7 0 0 1 1.083.593v12.532a.7.7 0 0 1-1.083.593L4 9.15V14.3a.7.7 0 0 1-.7.7H1.6a.7.7 0 0 1-.7-.7V1.7a.7.7 0 0 1 .7-.7H3.3z"/></svg>`;
   var SVG_PLAY = `<svg viewBox="0 0 16 16"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894a.7.7 0 0 1-1.05-.607V1.713z"/></svg>`;
   var SVG_PAUSE = `<svg viewBox="0 0 16 16"><path d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm7.4 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z"/></svg>`;
@@ -1725,6 +1774,7 @@
     loadingBar.appendChild(loadingBarInner);
     const header = h("div", { id: "lyrify-header" });
     const headerTitleEl = h("div", { id: "lyrify-title" });
+    const reqSyncBtn = h("button", { className: "lyrify-req-sync-btn" }, "Request Sync");
     const headerRight = h("div", { id: "lyrify-header-right" });
     const splitViewBtn = h("button", { id: "lyrify-splitview-toggle", title: "Immersive Split-screen" }, "\u26F6");
     const miniBtn = h("button", { id: "lyrify-mini-toggle" }, "Mini");
@@ -1733,6 +1783,7 @@
     headerRight.appendChild(miniBtn);
     headerRight.appendChild(settingsBtn);
     header.appendChild(headerTitleEl);
+    header.appendChild(reqSyncBtn);
     header.appendChild(headerRight);
     const body = h("div", { id: "lyrify-body" });
     const meta = h("div", { id: "lyrify-meta" });
@@ -2108,6 +2159,37 @@
           });
           lastLyricsKey = lyricsKey;
           scrollInner.scrollTop = 0;
+        }
+        const shouldShowReq = !isMiniOpen && !lyrics.synced && lyrics.lines.length > 0 && lyrics.trackKey && lyrics.trackKey !== "none";
+        if (shouldShowReq) {
+          reqSyncBtn.classList.add("s-visible");
+          reqSyncBtn.onclick = () => {
+            var _a2, _b, _c, _d, _e, _f, _g;
+            if (reqSyncBtn.classList.contains("s-success")) return;
+            reqSyncBtn.classList.add("s-success");
+            reqSyncBtn.textContent = "\u2713 Requested";
+            const spc = window.Spicetify.Player;
+            const tInfo = ((_b = (_a2 = spc.data) == null ? void 0 : _a2.track) == null ? void 0 : _b.metadata) || {};
+            const fallbackArtist = (_e = (_d = (_c = spc.data) == null ? void 0 : _c.item) == null ? void 0 : _d.artists) == null ? void 0 : _e.map((a) => a.name).join(", ");
+            const artist = tInfo.artist_name || fallbackArtist || "Unknown Artist";
+            const title = tInfo.title || ((_g = (_f = spc.data) == null ? void 0 : _f.item) == null ? void 0 : _g.name) || "Unknown Track";
+            fetch("https://lyrify-api.aquashield.lol/request-sync", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ trackKey: lyrics.trackKey, artist, title })
+            }).catch(() => {
+            });
+            setTimeout(() => {
+              reqSyncBtn.classList.add("s-fade-out");
+              setTimeout(() => {
+                reqSyncBtn.classList.remove("s-visible", "s-success", "s-fade-out");
+                reqSyncBtn.textContent = "Request Sync";
+              }, 400);
+            }, 2e3);
+          };
+        } else {
+          reqSyncBtn.classList.remove("s-visible", "s-success", "s-fade-out");
+          reqSyncBtn.textContent = "Request Sync";
         }
         Array.from(linesEl.children).forEach((el, i) => {
           el.classList.toggle("s-active", i === activeIdx);
@@ -3380,6 +3462,14 @@ ${msg}`;
         };
         const sendMissingPing = (trackKey2, artist, title) => {
           fetch(`${BACKEND_BASE_URL}/track-missing`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ trackKey: trackKey2, artist, title })
+          }).catch(() => {
+          });
+        };
+        const sendRequestSyncPing = (trackKey2, artist, title) => {
+          fetch(`${BACKEND_BASE_URL}/request-sync`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ trackKey: trackKey2, artist, title })

@@ -337,6 +337,14 @@ async function startExtension() {
                 }).catch(() => { });
             };
 
+            const sendRequestSyncPing = (trackKey: string, artist: string, title: string) => {
+                fetch(`${BACKEND_BASE_URL}/request-sync`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ trackKey, artist: artist, title: title })
+                }).catch(() => { });
+            };
+
             const sendPlayPing = (trackKey: string, artist: string, title: string, hasSynced: boolean, uri?: string) => {
                 fetch(`${BACKEND_BASE_URL}/track-play`, {
                     method: "POST",
@@ -507,6 +515,7 @@ async function startExtension() {
                     updateTriggerButtonState(true);
                 } else {
                     el.style.display = "none";
+                    overlay.resetSplitView();
                     updateTriggerButtonState(false);
                 }
             });

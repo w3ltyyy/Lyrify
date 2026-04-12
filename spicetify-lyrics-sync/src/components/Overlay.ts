@@ -6,7 +6,7 @@ import { createRecordHud } from "./RecordHud";
 import { ManualSyncController } from "../manualSync";
 import { formatMs } from "../utils";
 
-const SVG_PREV = `<svg viewBox="0 0 16 16"><path d="M12.7 1a.7.7 0 0 0-.7.7v5.15L3.483 1.141a.7.7 0 0 0-1.083.593v12.532a.7.7 0 0 0 1.083.593L12 9.15V14.3a.7.7 0 0 0 .7.7h1.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-1.6z"/></svg>`;
+const SVG_PREV = `<svg viewBox="0 0 16 16"><path d="M12.7 1a.7.7 0 0 0-.7.7v5.15L3.483 1.141a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm7.4 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z"/></svg>`;
 const SVG_NEXT = `<svg viewBox="0 0 16 16"><path d="M3.3 1a.7.7 0 0 1 .7.7v5.15l8.517-5.709a.7.7 0 0 1 1.083.593v12.532a.7.7 0 0 1-1.083.593L4 9.15V14.3a.7.7 0 0 1-.7.7H1.6a.7.7 0 0 1-.7-.7V1.7a.7.7 0 0 1 .7-.7H3.3z"/></svg>`;
 const SVG_PLAY = `<svg viewBox="0 0 16 16"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894a.7.7 0 0 1-1.05-.607V1.713z"/></svg>`;
 const SVG_PAUSE = `<svg viewBox="0 0 16 16"><path d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm7.4 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z"/></svg>`;
@@ -27,6 +27,7 @@ export function createOverlay(options: {
   
   const header = h("div", { id: "lyrify-header" });
   const headerTitleEl = h("div", { id: "lyrify-title" });
+  const reqSyncBtn = h("button", { className: "lyrify-req-sync-btn" }, "Request Sync");
   
   const headerRight = h("div", { id: "lyrify-header-right" });
   const splitViewBtn = h("button", { id: "lyrify-splitview-toggle", title: "Immersive Split-screen" }, "⛶");
@@ -37,6 +38,7 @@ export function createOverlay(options: {
   headerRight.appendChild(miniBtn);
   headerRight.appendChild(settingsBtn);
   header.appendChild(headerTitleEl);
+  header.appendChild(reqSyncBtn);
   header.appendChild(headerRight);
 
   const body = h("div", { id: "lyrify-body" });
@@ -444,8 +446,43 @@ export function createOverlay(options: {
             }, l.text);
             linesEl.appendChild(div);
           });
+          
           lastLyricsKey = lyricsKey;
           scrollInner.scrollTop = 0;
+      }
+
+      // Handle Request Sync visibility and animation
+      const shouldShowReq = !isMiniOpen && !lyrics.synced && lyrics.lines.length > 0 && lyrics.trackKey && lyrics.trackKey !== "none";
+      if (shouldShowReq) {
+          reqSyncBtn.classList.add("s-visible");
+          reqSyncBtn.onclick = () => {
+              if (reqSyncBtn.classList.contains("s-success")) return;
+              
+              reqSyncBtn.classList.add("s-success");
+              reqSyncBtn.textContent = "✓ Requested";
+              
+              const spc = (window as any).Spicetify.Player;
+              const tInfo = spc.data?.track?.metadata || {};
+              const fallbackArtist = spc.data?.item?.artists?.map((a:any)=>a.name).join(", ");
+              const artist = tInfo.artist_name || fallbackArtist || "Unknown Artist";
+              const title = tInfo.title || spc.data?.item?.name || "Unknown Track";
+              
+              fetch("https://lyrify-api.aquashield.lol/request-sync", {
+                  method: "POST", headers:{"Content-Type":"application/json"},
+                  body: JSON.stringify({ trackKey: lyrics.trackKey, artist, title })
+              }).catch(()=>{});
+
+              setTimeout(() => {
+                  reqSyncBtn.classList.add("s-fade-out");
+                  setTimeout(() => {
+                      reqSyncBtn.classList.remove("s-visible", "s-success", "s-fade-out");
+                      reqSyncBtn.textContent = "Request Sync";
+                  }, 400);
+              }, 2000);
+          };
+      } else {
+          reqSyncBtn.classList.remove("s-visible", "s-success", "s-fade-out");
+          reqSyncBtn.textContent = "Request Sync";
       }
 
       // Efficient class updates

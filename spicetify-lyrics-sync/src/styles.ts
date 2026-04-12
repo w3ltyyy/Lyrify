@@ -253,7 +253,7 @@ export const STYLES = `
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.05);
       color: rgba(255, 255, 255, 0.8);
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       cursor: pointer;
@@ -261,10 +261,59 @@ export const STYLES = `
       opacity: 0;
       transition: all 0.2s ease;
     }
+    #lyrify-overlay.s-split-view .lyrify-fs-exit-btn {
+      display: flex;
+    }
     #lyrify-overlay.s-split-view.s-mouse-active .lyrify-fs-exit-btn,
     .lyrify-fs-exit-btn:hover {
       opacity: 1 !important;
       pointer-events: auto;
+    }
+
+    /* Request Sync Button */
+    .lyrify-req-sync-btn {
+      position: relative;
+      margin-left: 14px;
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+    .lyrify-req-sync-btn.s-visible {
+      opacity: 1;
+      pointer-events: auto;
+      display: inline-flex;
+    }
+    .lyrify-req-sync-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+    .lyrify-req-sync-btn.s-success {
+      background: rgba(30, 215, 96, 0.4);
+      border-color: rgba(30, 215, 96, 0.8);
+      color: #fff;
+    }
+    .lyrify-req-sync-btn.s-fade-out {
+      opacity: 0;
+      transform: scale(0.9);
     }
     .lyrify-fs-exit-btn:hover {
       background: rgba(255, 255, 255, 0.2);

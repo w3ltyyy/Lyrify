@@ -6,7 +6,6 @@ export const LS_UI_BLUR = "lyrify_ui_blur_px";
 export const LS_UI_BRIGHT = "lyrify_ui_brightness";
 export const LS_UI_AUTO = "lyrify_ui_auto_scroll";
 export const LS_UI_DEBUG = "lyrify_ui_show_debug";
-export const LS_UI_FULLSCREEN = "lyrify_ui_fullscreen";
 export const LS_UI_AUTOGEN = "lyrify_ui_autogen_sync";
 export const LS_UI_LINE_GAP = "lyrify_ui_line_gap";
 export const LS_UI_MAX_W = "lyrify_ui_max_width";
@@ -23,7 +22,6 @@ export function readUiSettings() {
     brightness: Math.min(1.35, Math.max(0.75, Number(localStorage.getItem(LS_UI_BRIGHT) || "1") || 1)),
     autoScroll: localStorage.getItem(LS_UI_AUTO) !== "0",
     showDebug: localStorage.getItem(LS_UI_DEBUG) === "1",
-    fullscreen: localStorage.getItem(LS_UI_FULLSCREEN) !== "0",
     autoGenerate: localStorage.getItem(LS_UI_AUTOGEN) !== "0",
     lineGapPx: Math.min(28, Math.max(8, Number(localStorage.getItem(LS_UI_LINE_GAP) || "14") || 14)),
     maxWidthPx: Math.min(960, Math.max(480, Number(localStorage.getItem(LS_UI_MAX_W) || "720") || 720)),
@@ -79,7 +77,6 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
 
   const autoScrollCb = h("input", { type: "checkbox" }) as HTMLInputElement;
   const showDebugCb = h("input", { type: "checkbox" }) as HTMLInputElement;
-  const fullscreenCb = h("input", { type: "checkbox" }) as HTMLInputElement;
   const autogenCb = h("input", { type: "checkbox" }) as HTMLInputElement;
   const edgeFadeCb = h("input", { type: "checkbox" }) as HTMLInputElement;
   const vibrantCb = h("input", { type: "checkbox" }) as HTMLInputElement;
@@ -102,7 +99,6 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
   generalSection.appendChild(row("Brightness", brightRange, brightVal));
   generalSection.appendChild(row("Auto-scroll", autoScrollCb, h("span")));
   generalSection.appendChild(row("Show debug", showDebugCb, h("span")));
-  generalSection.appendChild(row("Fullscreen", fullscreenCb, h("span")));
   generalSection.appendChild(row("Contributor Nickname", nicknameInput, h("span")));
 
   appearanceSection.appendChild(h("div", { className: "lyrify-settings-subtitle" }, "Lyrics column"));
@@ -145,7 +141,6 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
     brightVal.textContent = `${Math.round(s.brightness * 100)}%`;
     autoScrollCb.checked = s.autoScroll;
     showDebugCb.checked = s.showDebug;
-    fullscreenCb.checked = s.fullscreen;
     autogenCb.checked = s.autoGenerate;
     edgeFadeCb.checked = s.edgeFade;
     vibrantCb.checked = s.vibrant;
@@ -167,7 +162,6 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
         target.style.setProperty("--lyrify-lines-gap", `${s.lineGapPx}px`);
         target.style.setProperty("--lyrify-lines-max-width", `${s.maxWidthPx}px`);
         target.style.setProperty("--lyrify-line-dim-opacity", String(s.inactiveOpacityPct / 100));
-        target.classList.toggle("s-fullscreen", s.fullscreen);
         target.classList.toggle("s-vibrant-enabled", s.vibrant);
         target.classList.toggle("s-highlight-enabled", s.highlightActive);
         
@@ -185,7 +179,6 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
     localStorage.setItem(LS_UI_BRIGHT, String(Number(brightRange.value) / 100));
     localStorage.setItem(LS_UI_AUTO, autoScrollCb.checked ? "1" : "0");
     localStorage.setItem(LS_UI_DEBUG, showDebugCb.checked ? "1" : "0");
-    localStorage.setItem(LS_UI_FULLSCREEN, fullscreenCb.checked ? "1" : "0");
     localStorage.setItem(LS_UI_AUTOGEN, autogenCb.checked ? "1" : "0");
     localStorage.setItem(LS_UI_EDGE_FADE, edgeFadeCb.checked ? "1" : "0");
     localStorage.setItem(LS_UI_VIBRANT, vibrantCb.checked ? "1" : "0");
@@ -202,7 +195,7 @@ export function createSettingsPanel(targetOverlay?: HTMLElement, onClearCache?: 
   };
 
   [fontRange, blurRange, brightRange, lineGapRange, maxWidthRange, inactiveOpRange].forEach(input => input.oninput = persist);
-  [autoScrollCb, showDebugCb, fullscreenCb, autogenCb, edgeFadeCb, vibrantCb, highlightActiveCb].forEach(cb => cb.onchange = persist);
+  [autoScrollCb, showDebugCb, autogenCb, edgeFadeCb, vibrantCb, highlightActiveCb].forEach(cb => cb.onchange = persist);
   nicknameInput.oninput = persist;
 
   recordCb.onchange = () => {

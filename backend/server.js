@@ -55,6 +55,13 @@ db.exec(`
         unsyncedHits INTEGER DEFAULT 0,
         lastPlayed INTEGER
     );
+    CREATE TABLE IF NOT EXISTS syncRequests (
+        trackKey TEXT PRIMARY KEY,
+        artist TEXT,
+        title TEXT,
+        count INTEGER DEFAULT 0,
+        lastRequested INTEGER
+    );
     CREATE TABLE IF NOT EXISTS users (
         authorId TEXT PRIMARY KEY,
         nickname TEXT,
@@ -90,7 +97,7 @@ function sendJson(res, status, payload) {
   res.writeHead(status, {
     "Content-Type": "application/json; charset=utf-8",
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+    "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type"
   });
   res.end(body);
@@ -298,6 +305,18 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
+    if (req.method === "POST" && url.pathname === "/request-sync") {
+        const { trackKey, artist, title } = await readBodyJson(req);
+        if (trackKey) {
+            db.prepare("INSERT OR IGNORE INTO syncRequests (trackKey, artist, title, count, lastRequested) VALUES (?, ?, ?, 0, ?)")
+              .run(trackKey, artist || "", title || "", Date.now());
+            db.prepare("UPDATE syncRequests SET count = count + 1, lastRequested = ? WHERE trackKey = ?")
+              .run(Date.now(), trackKey);
+        }
+        sendJson(res, 200, { ok: true });
+        return;
+    }
+
     if (req.method === "POST" && url.pathname === "/track-play") {
         const { trackKey, artist, title, hasSynced, uri } = await readBodyJson(req);
         const storageKey = uri || trackKey;
@@ -345,6 +364,7 @@ const server = http.createServer(async (req, res) => {
         
         const telemetryTimeline = db.prepare("SELECT * FROM telemetry ORDER BY date ASC LIMIT 30").all();
         const topMissing = db.prepare("SELECT * FROM missingTracks ORDER BY count DESC LIMIT 50").all();
+        const topRequests = db.prepare("SELECT * FROM syncRequests ORDER BY count DESC LIMIT 50").all();
         
         const trackStats = db.prepare("SELECT * FROM trackActivity").all();
         const totalSyncedHits = db.prepare("SELECT sum(syncedHits) as s FROM trackActivity").get().s || 0;
@@ -359,7 +379,7 @@ const server = http.createServer(async (req, res) => {
 
         sendJson(res, 200, { ok: true, stats: { 
             totalSyncs, totalSubmissions, pendingSubmissions, rejectedSubmissions, totalUniqueUsers,
-            telemetryTimeline, topMissing, topContributors, geoStats,
+            telemetryTimeline, topMissing, topRequests, topContributors, geoStats,
             playback: { totalSyncedHits, totalUnsyncedHits, topSyncedTracks, topUnsyncedTracks }
         } });
         return;
@@ -370,6 +390,70 @@ const server = http.createServer(async (req, res) => {
         const fiveMinsAgo = Date.now() - 5 * 60 * 1000;
         const result = db.prepare("SELECT count(*) as c FROM users WHERE lastActive > ?").get(fiveMinsAgo);
         sendJson(res, 200, { ok: true, count: result.c });
+        return;
+    }
+
+    if (req.method === "GET" && url.pathname === "/admin/clear-missing/preview") {
+        if (!requireAdmin(req, url)) return sendJson(res, 403, { error: "forbidden" });
+        const fromTs = url.searchParams.get("from") ? Number(url.searchParams.get("from")) : null;
+        const toTs   = url.searchParams.get("to")   ? Number(url.searchParams.get("to"))   : null;
+        const days   = url.searchParams.get("days")  ? Number(url.searchParams.get("days"))  : null;
+        let result;
+        if (fromTs !== null && toTs !== null) {
+            result = db.prepare("SELECT count(*) as c FROM missingTracks WHERE lastRequested >= ? AND lastRequested <= ?").get(fromTs, toTs);
+        } else {
+            const cutoff = Date.now() - (days || 30) * 24 * 60 * 60 * 1000;
+            result = db.prepare("SELECT count(*) as c FROM missingTracks WHERE lastRequested < ?").get(cutoff);
+        }
+        sendJson(res, 200, { ok: true, count: result.c });
+        return;
+    }
+
+    if (req.method === "DELETE" && url.pathname === "/admin/clear-missing") {
+        if (!requireAdmin(req, url)) return sendJson(res, 403, { error: "forbidden" });
+        const fromTs = url.searchParams.get("from") ? Number(url.searchParams.get("from")) : null;
+        const toTs   = url.searchParams.get("to")   ? Number(url.searchParams.get("to"))   : null;
+        const days   = url.searchParams.get("days")  ? Number(url.searchParams.get("days"))  : null;
+        let result;
+        if (fromTs !== null && toTs !== null) {
+            result = db.prepare("DELETE FROM missingTracks WHERE lastRequested >= ? AND lastRequested <= ?").run(fromTs, toTs);
+        } else {
+            const cutoff = Date.now() - (days || 30) * 24 * 60 * 60 * 1000;
+            result = db.prepare("DELETE FROM missingTracks WHERE lastRequested < ?").run(cutoff);
+        }
+        sendJson(res, 200, { ok: true, deleted: result.changes });
+        return;
+    }
+
+    if (req.method === "GET" && url.pathname === "/admin/clear-requests/preview") {
+        if (!requireAdmin(req, url)) return sendJson(res, 403, { error: "forbidden" });
+        const fromTs = url.searchParams.get("from") ? Number(url.searchParams.get("from")) : null;
+        const toTs   = url.searchParams.get("to")   ? Number(url.searchParams.get("to"))   : null;
+        const days   = url.searchParams.get("days")  ? Number(url.searchParams.get("days"))  : null;
+        let result;
+        if (fromTs !== null && toTs !== null) {
+            result = db.prepare("SELECT count(*) as c FROM syncRequests WHERE lastRequested >= ? AND lastRequested <= ?").get(fromTs, toTs);
+        } else {
+            const cutoff = Date.now() - (days || 30) * 24 * 60 * 60 * 1000;
+            result = db.prepare("SELECT count(*) as c FROM syncRequests WHERE lastRequested < ?").get(cutoff);
+        }
+        sendJson(res, 200, { ok: true, count: result.c });
+        return;
+    }
+
+    if (req.method === "DELETE" && url.pathname === "/admin/clear-requests") {
+        if (!requireAdmin(req, url)) return sendJson(res, 403, { error: "forbidden" });
+        const fromTs = url.searchParams.get("from") ? Number(url.searchParams.get("from")) : null;
+        const toTs   = url.searchParams.get("to")   ? Number(url.searchParams.get("to"))   : null;
+        const days   = url.searchParams.get("days")  ? Number(url.searchParams.get("days"))  : null;
+        let result;
+        if (fromTs !== null && toTs !== null) {
+            result = db.prepare("DELETE FROM syncRequests WHERE lastRequested >= ? AND lastRequested <= ?").run(fromTs, toTs);
+        } else {
+            const cutoff = Date.now() - (days || 30) * 24 * 60 * 60 * 1000;
+            result = db.prepare("DELETE FROM syncRequests WHERE lastRequested < ?").run(cutoff);
+        }
+        sendJson(res, 200, { ok: true, deleted: result.changes });
         return;
     }
 
